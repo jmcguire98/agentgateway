@@ -96,7 +96,7 @@ export const getBackendName = (backend: Backend): string => {
   }
   if (backend.service) return backend.service.name?.hostname || "";
   if (backend.host) {
-    return typeof backend.host === "string" ? backend.host : String(backend.host);
+    return typeof backend.host === "string" ? backend.host : String(backend.host.name?? "Unknown");
   }
   if (backend.dynamic) return "Dynamic Backend";
   return "Unknown Backend";
@@ -168,7 +168,7 @@ export const getBackendDetails = (backend: Backend): { primary: string; secondar
   }
 
   if (backend.host) {
-    const hostStr = typeof backend.host === "string" ? backend.host : String(backend.host);
+    const hostStr = typeof backend.host === "string" ? backend.host : String(backend.host.Hostname?.[0] ?? "");
     if (hostStr.includes(":")) {
       const [hostname, port] = hostStr.split(":");
       return {

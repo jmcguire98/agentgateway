@@ -66,7 +66,7 @@ export function configDumpToLocalConfig(configDump: any): LocalConfig {
  */
 function mapToBind(bindData: any, backends: Backend[]): Bind {
   return {
-    port: parseInt(bindData.key.split("/")[1], 10),
+    port: parseInt(bindData.address.split(":")[1]),
     listeners: Object.values(bindData.listeners || {}).map((listenerData: any) =>
       mapToListener(listenerData, backends)
     ),

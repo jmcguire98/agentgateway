@@ -12,11 +12,32 @@ export function isXdsMode() {
 let xdsMode = false;
 let xdsModeKnown = false;
 
+type XdsSubscriber = (val: boolean) => void;
+const xdsSubscribers: XdsSubscriber[] = [];
+
+function setAndBroadcastXds(val: boolean) {
+  if (xdsMode !== val) {
+    xdsMode = val;
+    xdsSubscribers.forEach((cb) => cb(val));
+  }
+  xdsModeKnown = true;
+}
+
+export function subscribeXdsMode(cb: XdsSubscriber) {
+  xdsSubscribers.push(cb);
+  return () => {
+    const idx = xdsSubscribers.indexOf(cb);
+    if (idx >= 0) xdsSubscribers.splice(idx, 1);
+  };
+}
+
 /**
  * Fetches the full configuration from the agentgateway server
  */
 export async function fetchConfig(): Promise<LocalConfig> {
   try {
+    console.log("fetchConfig", xdsModeKnown);
+    console.log("xdsMode", xdsMode);
     if (xdsModeKnown) {
       return xdsMode ? fetchViaDump() : fetchViaConfig();
     }
@@ -25,18 +46,15 @@ export async function fetchConfig(): Promise<LocalConfig> {
     if (dumpResp.ok) {
       const dumpJson = await dumpResp.json();
       if (dumpJson?.config?.xds?.address) {
-        xdsMode = true;
-        xdsModeKnown = true;
+        setAndBroadcastXds(true);
         return configDumpToLocalConfig(dumpJson);
       }
 
-      xdsMode = false;
-      xdsModeKnown = true;
+      setAndBroadcastXds(false);
       return fetchViaConfig();
     }
 
-    xdsMode = false;
-    xdsModeKnown = true;
+    setAndBroadcastXds(false);
     return fetchViaConfig();
   } catch (error) {
     console.error("Error fetching config:", error);
