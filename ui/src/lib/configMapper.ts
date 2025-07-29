@@ -146,7 +146,7 @@ function mapToMatches(matchesData: any): Match[] {
 }
 
 /*
-* Policy helpers
+ * Policy helpers
  */
 function mapToPolicies(policiesData: any): Policies | undefined {
   if (!policiesData) return undefined;
