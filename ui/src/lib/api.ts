@@ -9,32 +9,59 @@ export function isXdsMode() {
   return xdsMode;
 }
 
-const xdsMode = false;
+let xdsMode = false;
+let xdsModeKnown = false;
 
 /**
  * Fetches the full configuration from the agentgateway server
  */
 export async function fetchConfig(): Promise<LocalConfig> {
   try {
-    const response = await fetch(`${API_URL}/config_dump`);
-
-    if (!response.ok) {
-      if (response.status === 500) {
-        const errorText = await response.text();
-        const error = new Error(`Server configuration error: ${errorText}`);
-        (error as any).isConfigurationError = true;
-        (error as any).status = 500;
-        throw error;
-      }
-
-      throw new Error(`Failed to fetch config: ${response.status} ${response.statusText}`);
+    if (xdsModeKnown) {
+      return xdsMode ? fetchViaDump() : fetchViaConfig();
     }
 
-    const data = await response.json();
-    return configDumpToLocalConfig(data);
+    const dumpResp = await fetch(`${API_URL}/config_dump`);
+    if (dumpResp.ok) {
+      const dumpJson = await dumpResp.json();
+      if (dumpJson?.config?.xds?.address) {
+        xdsMode = true;
+        xdsModeKnown = true;
+        return configDumpToLocalConfig(dumpJson);
+      }
+
+      xdsMode = false;
+      xdsModeKnown = true;
+      return fetchViaConfig();
+    }
+
+    xdsMode = false;
+    xdsModeKnown = true;
+    return fetchViaConfig();
   } catch (error) {
     console.error("Error fetching config:", error);
     throw error;
+  }
+
+  async function fetchViaDump(): Promise<LocalConfig> {
+    const r = await fetch(`${API_URL}/config_dump`);
+    if (!r.ok) throw new Error(`Failed to fetch config dump: ${r.status}`);
+    return configDumpToLocalConfig(await r.json());
+  }
+
+  async function fetchViaConfig(): Promise<LocalConfig> {
+    const r = await fetch(`${API_URL}/config`);
+    if (!r.ok) {
+      if (r.status === 500) {
+        const txt = await r.text();
+        const err: any = new Error(`Server configuration error: ${txt}`);
+        err.isConfigurationError = true;
+        err.status = 500;
+        throw err;
+      }
+      throw new Error(`Failed to fetch config: ${r.status}`);
+    }
+    return (await r.json()) as LocalConfig;
   }
 }
 

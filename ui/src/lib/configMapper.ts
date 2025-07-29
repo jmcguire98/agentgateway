@@ -1,5 +1,4 @@
 // Mapping utilities to convert the /config_dump response into the LocalConfig TypeScript object tree.
-
 import {
   Bind,
   Backend,
@@ -44,7 +43,7 @@ import {
 } from "./types";
 
 /*
- * Public entry -------------------------------------------------------------------
+ * Public entry
  */
 export function configDumpToLocalConfig(configDump: any): LocalConfig {
   const localConfig: LocalConfig = {
@@ -63,7 +62,7 @@ export function configDumpToLocalConfig(configDump: any): LocalConfig {
 }
 
 /*
- * Bind / Listener / Route ---------------------------------------------------------
+ * Bind / Listener / Route
  */
 function mapToBind(bindData: any, backends: Backend[]): Bind {
   return {
@@ -147,7 +146,7 @@ function mapToMatches(matchesData: any): Match[] {
 }
 
 /*
- * Policy helpers ------------------------------------------------------------------
+* Policy helpers
  */
 function mapToPolicies(policiesData: any): Policies | undefined {
   if (!policiesData) return undefined;
@@ -194,7 +193,7 @@ function mapToTcpPolicies(data: any): TcpPolicies | undefined {
 }
 
 /*
- * Backend helpers -----------------------------------------------------------------
+ * Backend helpers
  */
 function mapToBackend(backendData: any): Backend | undefined {
   if (!backendData || typeof backendData !== "object") return undefined;
@@ -246,7 +245,7 @@ function getBackendName(backend: Backend): string {
 }
 
 /*
- * Filter helpers ------------------------------------------------------------------
+ * Filter helpers
  */
 function mapToFilter(data: any): any {
   const filter: any = {};
@@ -350,7 +349,7 @@ function mapToTlsConfig(data: any): TlsConfig | undefined {
 }
 
 /*
- * Sub-helpers for modifiers, redirects, TLS, etc. ---------------------------------
+ * Sub-helpers for modifiers, redirects, TLS, etc.
  */
 function mapToHeaderModifier(data: any): HeaderModifier | undefined {
   if (!data || typeof data !== "object") return undefined;
