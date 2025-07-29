@@ -2,60 +2,97 @@ import { Target, Listener, LocalConfig, Bind, Backend, Route, ListenerProtocol }
 
 const API_URL = process.env.NODE_ENV === "production" ? "" : "http://localhost:15000";
 
-/**
- * Checks if the application is running in XDS mode
- */
-export function isXdsMode(): boolean {
-  console.log("isXdsMode called with:", process.env.XDS_ADDRESS);
-  return !!process.env.XDS_ADDRESS;
+export function isXdsMode() {
+  return xdsMode
 }
 
-function xdsToLocalConfig(xdsConfig: any): LocalConfig {
-  console.log("xdsToLocalConfig called with:", xdsConfig);
+let xdsMode = false;
 
+/**
+ * Fetches the full configuration from the agentgateway server
+ */
+export async function fetchConfig(): Promise<LocalConfig> {
+  try {
+    const response = await fetch(`${API_URL}/config_dump`);
+
+    if (!response.ok) {
+      if (response.status === 500) {
+        const errorText = await response.text();
+        const error = new Error(`Server configuration error: ${errorText}`);
+        (error as any).isConfigurationError = true;
+        (error as any).status = 500;
+        throw error;
+      }
+
+      throw new Error(`Failed to fetch config: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return configDumpToLocalConfig(data);
+  } catch (error) {
+    console.error("Error fetching config:", error);
+    throw error;
+  }
+}
+
+/**
+ * Converts the config_dump response from the agentgateway server to a LocalConfig ts object
+ */
+export function configDumpToLocalConfig(configDump: any): LocalConfig {
   const localConfig: LocalConfig = {
     binds: [],
-    workloads: xdsConfig.workloads || [],
-    services: xdsConfig.services || [],
+    workloads: configDump.workloads || [],
+    services: configDump.services || [],
   };
 
+  // if the xds address is set, we should not allow the user to update the config via the UI
+  if (configDump.config?.xds?.address) {
+    console.log("XDS mode enabled");
+    xdsMode = true;
+  }
+
   const backendMap = new Map<string, any>();
-  if (Array.isArray(xdsConfig.backends)) {
-    xdsConfig.backends.forEach((backend: any) => {
-      if (backend.host && backend.host.length > 0) {
-        backendMap.set(backend.host[0], backend);
+  if (Array.isArray(configDump.backends)) {
+    configDump.backends.forEach((backend: any) => {
+      if (backend.host && backend.host.target) {
+        backendMap.set(backend.host.target, backend);
       }
     });
   }
 
-  if (!Array.isArray(xdsConfig.binds)) {
+  if (!Array.isArray(configDump.binds)) {
     return localConfig;
   }
 
-  xdsConfig.binds.forEach((bindData: any) => {
-    const portStr = bindData.address?.split(":")[1];
-    if (!portStr) return;
-    const port = parseInt(portStr, 10);
-    if (isNaN(port)) return;
+  configDump.binds.forEach((bindData: any) => {
+    const port = bindData.port;
+    if (typeof port !== "number") return;
 
     const newBind: Bind = {
       port: port,
       listeners: [],
     };
 
-    if (typeof bindData.listeners === "object" && bindData.listeners !== null) {
+    if (
+      bindData.listeners &&
+      typeof bindData.listeners === "object" &&
+      !Array.isArray(bindData.listeners)
+    ) {
       Object.values(bindData.listeners).forEach((listenerData: any) => {
         const routes: Route[] = [];
-        if (typeof listenerData.routes === "object" && listenerData.routes !== null) {
+        if (
+          listenerData.routes &&
+          typeof listenerData.routes === "object" &&
+          !Array.isArray(listenerData.routes)
+        ) {
           Object.values(listenerData.routes).forEach((routeData: any) => {
             const backends: Backend[] = [];
             if (Array.isArray(routeData.backends)) {
               routeData.backends.forEach((backendRef: any) => {
-                const backendInfo = backendMap.get(backendRef.backend);
-                if (backendInfo && backendInfo.host && backendInfo.host.length > 1) {
-                  const hostParts = backendInfo.host[1].split(":");
-                  const hostname = hostParts[0];
-                  const port = hostParts.length > 1 ? parseInt(hostParts[1], 10) : 80;
+                const backendInfo = backendMap.get(backendRef.name);
+                if (backendInfo && backendInfo.host && backendInfo.host.target) {
+                  const [hostname, portStr] = backendInfo.host.target.split(":");
+                  const port = portStr ? parseInt(portStr, 10) : 80;
 
                   if (hostname && !isNaN(port)) {
                     backends.push({
@@ -93,40 +130,10 @@ function xdsToLocalConfig(xdsConfig: any): LocalConfig {
     localConfig.binds.push(newBind);
   });
 
-  console.log("Transformed localConfig:", localConfig);
   return localConfig;
 }
 
-/**
- * Fetches the full configuration from the agentgateway server
- */
-export async function fetchConfig(): Promise<LocalConfig> {
-  const url = isXdsMode() ? `${API_URL}/config_dump` : `${API_URL}/config`;
-  try {
-    const response = await fetch(url);
 
-    if (!response.ok) {
-      if (response.status === 500) {
-        const errorText = await response.text();
-        const error = new Error(`Server configuration error: ${errorText}`);
-        (error as any).isConfigurationError = true;
-        (error as any).status = 500;
-        throw error;
-      }
-
-      throw new Error(`Failed to fetch config: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    if (isXdsMode()) {
-      return xdsToLocalConfig(data);
-    }
-    return data;
-  } catch (error) {
-    console.error("Error fetching config:", error);
-    throw error;
-  }
-}
 
 /**
  * Cleans up the configuration by removing empty arrays and undefined values
