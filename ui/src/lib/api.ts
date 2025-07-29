@@ -1,9 +1,22 @@
-import { Target, Listener, LocalConfig, Bind, Backend, Route, ListenerProtocol } from "./types";
+import {
+  Target,
+  Listener,
+  LocalConfig,
+  Bind,
+  Backend,
+  Route,
+  TcpRoute,
+  ListenerProtocol,
+  TcpPolicies,
+  Policies,
+  Match,
+  TlsConfig,
+} from "./types";
 
 const API_URL = process.env.NODE_ENV === "production" ? "" : "http://localhost:15000";
 
 export function isXdsMode() {
-  return xdsMode
+  return xdsMode;
 }
 
 let xdsMode = false;
@@ -50,46 +63,75 @@ export function configDumpToLocalConfig(configDump: any): LocalConfig {
     console.log("XDS mode enabled");
     xdsMode = true;
   }
-
-  if (!Array.isArray(configDump.binds)) {
-    // if there are no binds, there is nothing else for the ui to display
-    return localConfig;
-  }
-
-  configDump.binds.forEach((bindData: any) => {
-    const newBind: Bind = {
-      port: parseInt(bindData.key.split("/")[0]),
-      listeners: [],
-    };
-    bindData.listeners.forEach((listenerData: any) => {
-      const newListener: Listener = {
-        name: listenerData.name,
-        gatewayName: listenerData.gatewayName,
-        hostname: listenerData.hostname,
-        protocol: listenerData.protocol as ListenerProtocol,
-        routes: [],
-      };
-      listenerData.routes.forEach((routeData: any) => {
-          const newRoute: Route = {
-            name: routeData.routeName,
-            hostnames: routeData.hostnames || [],
-            matches: routeData.matches || [],
-            backends: routeData.backends || [],
-          };
-          newListener.routes?.push(newRoute);
-        });
-      newBind.listeners.push(newListener);
-    });
-
-    localConfig.binds.push(newBind);
-  });
-
-  console.log(localConfig);
+  localConfig.binds = (configDump.binds || []).map(mapToBind);
 
   return localConfig;
 }
 
+function mapToBind(bindData: any): Bind {
+  return {
+    port: parseInt(bindData.key.split("/")[0]),
+    listeners: (bindData.listeners || []).map(mapToListener),
+  };
+}
 
+function mapToListener(listenerData: any): Listener {
+  return {
+    name: listenerData.name,
+    gatewayName: listenerData.gatewayName,
+    hostname: listenerData.hostname,
+    protocol: listenerData.protocol as ListenerProtocol,
+    tls: mapToTlsConfig(listenerData.tls),
+    routes: (listenerData.routes || []).map(mapToRoute),
+    tcpRoutes: (listenerData.tcpRoutes || []).map(mapToTcpRoute),
+  };
+}
+
+function mapToRoute(routeData: any): Route {
+  return {
+    name: routeData.routeName,
+    ruleName: routeData.ruleName || "",
+    hostnames: routeData.hostnames || [],
+    matches: mapToMatches(routeData.matches),
+    policies: mapToPolicies(routeData.policies),
+    backends: (routeData.backends || []).map(mapToBackend),
+  };
+}
+
+function mapToTcpRoute(tcpRouteData: any): TcpRoute {
+  return {
+    name: tcpRouteData.routeName,
+    ruleName: tcpRouteData.ruleName || "",
+    hostnames: tcpRouteData.hostnames || [],
+    policies: mapToTcpPolicies(tcpRouteData.policies),
+    backends: (tcpRouteData.backends || []).map(mapToBackend),
+  };
+}
+
+function mapToMatches(matchesData: any): Match[] {
+  // TODO: Implement match mapping
+  return matchesData || [];
+}
+
+function mapToPolicies(policiesData: any): Policies | undefined {
+  // TODO: Implement policy mapping
+  return policiesData || undefined;
+}
+
+function mapToTcpPolicies(tcpPoliciesData: any): TcpPolicies | undefined {
+  // TODO: Implement TCP policy mapping
+  return tcpPoliciesData || undefined;
+}
+
+function mapToBackend(backendData: any): Backend | undefined {
+  // TODO: Implement backend mapping
+  return backendData || undefined;
+}
+
+function mapToTlsConfig(tlsData: any): TlsConfig | undefined {
+  // TODO: Implement TLS config mapping
+  return tlsData || undefined;
+}
 
 /**
  * Cleans up the configuration by removing empty arrays and undefined values

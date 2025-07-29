@@ -7,7 +7,8 @@ export function XdsModeNotification() {
 
   return (
     <div className="bg-yellow-500 text-center p-2 text-sm">
-      Configuration is managed by an external source (XDS). Editing the configuration is not allowed via the UI.
+      Configuration is managed by an external source (XDS). Editing the configuration is not allowed
+      via the UI.
     </div>
   );
-} 
+}
