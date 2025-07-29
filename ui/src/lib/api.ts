@@ -51,84 +51,40 @@ export function configDumpToLocalConfig(configDump: any): LocalConfig {
     xdsMode = true;
   }
 
-  const backendMap = new Map<string, any>();
-  if (Array.isArray(configDump.backends)) {
-    configDump.backends.forEach((backend: any) => {
-      if (backend.host && backend.host.target) {
-        backendMap.set(backend.host.target, backend);
-      }
-    });
-  }
-
   if (!Array.isArray(configDump.binds)) {
+    // if there are no binds, there is nothing else for the ui to display
     return localConfig;
   }
 
   configDump.binds.forEach((bindData: any) => {
-    const port = bindData.port;
-    if (typeof port !== "number") return;
-
     const newBind: Bind = {
-      port: port,
+      port: parseInt(bindData.key.split("/")[0]),
       listeners: [],
     };
-
-    if (
-      bindData.listeners &&
-      typeof bindData.listeners === "object" &&
-      !Array.isArray(bindData.listeners)
-    ) {
-      Object.values(bindData.listeners).forEach((listenerData: any) => {
-        const routes: Route[] = [];
-        if (
-          listenerData.routes &&
-          typeof listenerData.routes === "object" &&
-          !Array.isArray(listenerData.routes)
-        ) {
-          Object.values(listenerData.routes).forEach((routeData: any) => {
-            const backends: Backend[] = [];
-            if (Array.isArray(routeData.backends)) {
-              routeData.backends.forEach((backendRef: any) => {
-                const backendInfo = backendMap.get(backendRef.name);
-                if (backendInfo && backendInfo.host && backendInfo.host.target) {
-                  const [hostname, portStr] = backendInfo.host.target.split(":");
-                  const port = portStr ? parseInt(portStr, 10) : 80;
-
-                  if (hostname && !isNaN(port)) {
-                    backends.push({
-                      weight: backendRef.weight,
-                      host: {
-                        Hostname: [hostname, port],
-                      },
-                    });
-                  }
-                }
-              });
-            }
-
-            const newRoute: Route = {
-              name: routeData.routeName,
-              hostnames: routeData.hostnames || [],
-              matches: routeData.matches || [],
-              backends: backends,
-            };
-            routes.push(newRoute);
-          });
-        }
-
-        const newListener: Listener = {
-          name: listenerData.name,
-          gatewayName: listenerData.gatewayName,
-          hostname: listenerData.hostname,
-          protocol: listenerData.protocol as ListenerProtocol,
-          routes: routes,
-        };
-        newBind.listeners.push(newListener);
-      });
-    }
+    bindData.listeners.forEach((listenerData: any) => {
+      const newListener: Listener = {
+        name: listenerData.name,
+        gatewayName: listenerData.gatewayName,
+        hostname: listenerData.hostname,
+        protocol: listenerData.protocol as ListenerProtocol,
+        routes: [],
+      };
+      listenerData.routes.forEach((routeData: any) => {
+          const newRoute: Route = {
+            name: routeData.routeName,
+            hostnames: routeData.hostnames || [],
+            matches: routeData.matches || [],
+            backends: routeData.backends || [],
+          };
+          newListener.routes?.push(newRoute);
+        });
+      newBind.listeners.push(newListener);
+    });
 
     localConfig.binds.push(newBind);
   });
+
+  console.log(localConfig);
 
   return localConfig;
 }
