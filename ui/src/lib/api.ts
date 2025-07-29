@@ -1,13 +1,109 @@
-import { Target, Listener, LocalConfig, Bind, Backend, Route } from "./types";
+import { Target, Listener, LocalConfig, Bind, Backend, Route, ListenerProtocol } from "./types";
 
 const API_URL = process.env.NODE_ENV === "production" ? "" : "http://localhost:15000";
+
+/**
+ * Checks if the application is running in XDS mode
+ */
+export function isXdsMode(): boolean {
+  console.log("isXdsMode called with:", process.env.XDS_ADDRESS);
+  return !!process.env.XDS_ADDRESS;
+}
+
+function xdsToLocalConfig(xdsConfig: any): LocalConfig {
+  console.log("xdsToLocalConfig called with:", xdsConfig);
+
+  const localConfig: LocalConfig = {
+    binds: [],
+    workloads: xdsConfig.workloads || [],
+    services: xdsConfig.services || [],
+  };
+
+  const backendMap = new Map<string, any>();
+  if (Array.isArray(xdsConfig.backends)) {
+    xdsConfig.backends.forEach((backend: any) => {
+      if (backend.host && backend.host.length > 0) {
+        backendMap.set(backend.host[0], backend);
+      }
+    });
+  }
+
+  if (!Array.isArray(xdsConfig.binds)) {
+    return localConfig;
+  }
+
+  xdsConfig.binds.forEach((bindData: any) => {
+    const portStr = bindData.address?.split(":")[1];
+    if (!portStr) return;
+    const port = parseInt(portStr, 10);
+    if (isNaN(port)) return;
+
+    const newBind: Bind = {
+      port: port,
+      listeners: [],
+    };
+
+    if (typeof bindData.listeners === "object" && bindData.listeners !== null) {
+      Object.values(bindData.listeners).forEach((listenerData: any) => {
+        const routes: Route[] = [];
+        if (typeof listenerData.routes === "object" && listenerData.routes !== null) {
+          Object.values(listenerData.routes).forEach((routeData: any) => {
+            const backends: Backend[] = [];
+            if (Array.isArray(routeData.backends)) {
+              routeData.backends.forEach((backendRef: any) => {
+                const backendInfo = backendMap.get(backendRef.backend);
+                if (backendInfo && backendInfo.host && backendInfo.host.length > 1) {
+                  const hostParts = backendInfo.host[1].split(":");
+                  const hostname = hostParts[0];
+                  const port = hostParts.length > 1 ? parseInt(hostParts[1], 10) : 80;
+
+                  if (hostname && !isNaN(port)) {
+                    backends.push({
+                      weight: backendRef.weight,
+                      host: {
+                        Hostname: [hostname, port],
+                      },
+                    });
+                  }
+                }
+              });
+            }
+
+            const newRoute: Route = {
+              name: routeData.routeName,
+              hostnames: routeData.hostnames || [],
+              matches: routeData.matches || [],
+              backends: backends,
+            };
+            routes.push(newRoute);
+          });
+        }
+
+        const newListener: Listener = {
+          name: listenerData.name,
+          gatewayName: listenerData.gatewayName,
+          hostname: listenerData.hostname,
+          protocol: listenerData.protocol as ListenerProtocol,
+          routes: routes,
+        };
+        newBind.listeners.push(newListener);
+      });
+    }
+
+    localConfig.binds.push(newBind);
+  });
+
+  console.log("Transformed localConfig:", localConfig);
+  return localConfig;
+}
 
 /**
  * Fetches the full configuration from the agentgateway server
  */
 export async function fetchConfig(): Promise<LocalConfig> {
+  const url = isXdsMode() ? `${API_URL}/config_dump` : `${API_URL}/config`;
   try {
-    const response = await fetch(`${API_URL}/config`);
+    const response = await fetch(url);
 
     if (!response.ok) {
       if (response.status === 500) {
@@ -21,7 +117,10 @@ export async function fetchConfig(): Promise<LocalConfig> {
       throw new Error(`Failed to fetch config: ${response.status} ${response.statusText}`);
     }
 
-    const data: LocalConfig = await response.json();
+    const data = await response.json();
+    if (isXdsMode()) {
+      return xdsToLocalConfig(data);
+    }
     return data;
   } catch (error) {
     console.error("Error fetching config:", error);
@@ -99,6 +198,9 @@ function cleanupConfig(config: LocalConfig): LocalConfig {
  * Updates the configuration
  */
 export async function updateConfig(config: LocalConfig): Promise<void> {
+  if (isXdsMode()) {
+    throw new Error("Configuration is managed by XDS and cannot be updated via the UI.");
+  }
   try {
     // Clean up the config before sending
     const cleanedConfig = cleanupConfig(config);

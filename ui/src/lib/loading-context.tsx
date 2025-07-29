@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { isXdsMode } from "@/lib/api";
 
 interface LoadingContextType {
   isLoading: boolean;
@@ -15,6 +16,10 @@ export function LoadingProvider({ children }: { children: ReactNode }) {
   // Set a timeout to automatically turn off loading after 10 seconds
   // This is a safety measure to prevent infinite loading
   useEffect(() => {
+    if (isXdsMode()) {
+      setIsLoading(false);
+      return;
+    }
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 10000);

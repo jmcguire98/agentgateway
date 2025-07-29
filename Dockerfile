@@ -6,6 +6,8 @@ COPY ui .
 
 RUN npm install
 
+ARG XDS_ADDRESS
+ENV XDS_ADDRESS=${XDS_ADDRESS}
 RUN npm run build
 
 FROM docker.io/library/rust:1.88.0-slim-bookworm AS builder
