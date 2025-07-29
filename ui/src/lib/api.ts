@@ -192,7 +192,7 @@ export async function fetchMcpTargets(): Promise<any[]> {
         listener.routes?.forEach((route: Route) => {
           route.backends.forEach((backend: Backend) => {
             console.log("backend", backend);
-            if (backend.mcp) {
+            if (backend?.mcp) {
               mcpTargets.push(...backend.mcp.targets);
             }
           });

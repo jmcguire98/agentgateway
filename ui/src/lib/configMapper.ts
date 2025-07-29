@@ -238,7 +238,7 @@ function mapToRouteBackend(rb: any, backends: Backend[]): Backend | undefined {
 function getBackendName(backend: Backend): string {
   if (backend.service)
     return `${backend.service.name.namespace}/${backend.service.name.hostname}:${backend.service.port}`;
-  if (backend.host) return `${backend.host.Address}:${backend.host.Hostname}`;
+  if (backend.host) return backend.host.name ?? "";
   if (backend.mcp) return backend.mcp.name;
   if (backend.ai) return backend.ai.name;
   return "";
@@ -278,13 +278,18 @@ function mapToServiceBackend(data: any): ServiceBackend | undefined {
 
 function mapToHostBackend(data: any): HostBackend | undefined {
   if (!data) return undefined;
-  return {
-    Address: typeof data.Address === "string" ? data.Address : undefined,
-    Hostname:
-      Array.isArray(data.Hostname) && data.Hostname.length === 2
-        ? [String(data.Hostname[0]), Number(data.Hostname[1])]
-        : undefined,
-  } as HostBackend;
+  if (typeof data.target === "string") {
+    const [host, portStr] = data.target.split(":");
+    const port = Number(portStr);
+    if (!isNaN(port)) {
+      return {
+        Hostname: [host, port],
+        name: data.name,
+      } as HostBackend;
+    }
+  }
+
+  return undefined;
 }
 
 function mapToDynamicBackend(_: any): DynamicBackend {
