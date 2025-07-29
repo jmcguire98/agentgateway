@@ -6,9 +6,10 @@ COPY ui .
 
 RUN npm install
 
+#TODO: XDS_ADDRESS should not be set as a build-time arg
 ARG XDS_ADDRESS
 ENV XDS_ADDRESS=${XDS_ADDRESS}
-RUN npm run build
+RUN echo "Building with XDS_ADDRESS=$XDS_ADDRESS" && npm run build
 
 FROM docker.io/library/rust:1.88.0-slim-bookworm AS builder
 

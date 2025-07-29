@@ -12,7 +12,7 @@ KIND_CLUSTER_NAME ?= agentgateway
 # docker
 .PHONY: docker
 docker:
-	$(DOCKER_BUILDER) build $(DOCKER_BUILD_ARGS) -t $(IMAGE_FULL_NAME) . --progress=plain
+	$(DOCKER_BUILDER) build $(DOCKER_BUILD_ARGS) -t $(IMAGE_FULL_NAME) . --progress=plain --build-arg XDS_ADDRESS=http://kgateway.kgateway-system.svc.cluster.local:9977
 
 .PHONY: docker-ext
 docker-ext:
