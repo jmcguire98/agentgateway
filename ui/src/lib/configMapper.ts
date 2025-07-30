@@ -108,8 +108,8 @@ function mapToBackend(backendData: any): Backend | undefined {
   if (!backendData || typeof backendData !== "object") return undefined;
   const backend: Backend = {} as Backend;
   if (typeof backendData.weight === "number") backend.weight = backendData.weight;
-  else if (backendData.host) backend.host = mapToHostBackend(backendData.host);
   if (backendData.service) backend.service = mapToServiceBackend(backendData.service);
+  else if (backendData.host) backend.host = mapToHostBackend(backendData.host);
   else if (backendData.mcp) backend.mcp = mapToMcpBackend(backendData.mcp);
   else if (backendData.ai) backend.ai = mapToAiBackend(backendData.ai);
   return backend;
