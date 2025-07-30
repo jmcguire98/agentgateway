@@ -63,8 +63,6 @@ export function subscribeXdsMode(cb: XdsSubscriber) {
  */
 export async function fetchConfig(): Promise<LocalConfig> {
   try {
-    console.log("fetchConfig", xdsModeKnown);
-    console.log("xdsMode", xdsMode);
     if (xdsModeKnown) {
       return xdsMode ? fetchViaDump() : fetchViaConfig();
     }

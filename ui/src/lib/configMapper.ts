@@ -1,4 +1,5 @@
-// Mapping utilities to convert the /config_dump response into the LocalConfig TypeScript object tree.
+// Mapping utilities to attempt to convert the /config_dump response into the LocalConfig TypeScript object
+// Support for full conversion is not yet implemented.
 import {
   Bind,
   Backend,
@@ -19,9 +20,6 @@ import {
   AiBackend,
 } from "./types";
 
-/*
- * Public entry
- */
 export function configDumpToLocalConfig(configDump: any): LocalConfig {
   const localConfig: LocalConfig = {
     binds: [],

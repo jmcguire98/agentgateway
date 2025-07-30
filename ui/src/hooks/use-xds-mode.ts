@@ -14,4 +14,4 @@ export function useXdsMode(): boolean {
   }, []);
 
   return xds;
-} 
+}
