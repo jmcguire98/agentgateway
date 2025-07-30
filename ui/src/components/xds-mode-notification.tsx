@@ -1,14 +1,9 @@
 "use client";
 
-import { isXdsMode, subscribeXdsMode } from "@/lib/api";
-import { useEffect, useState } from "react";
+import { useXdsMode } from "@/hooks/use-xds-mode";
 
 export function XdsModeNotification() {
-  const [xds, setXds] = useState(isXdsMode());
-
-  useEffect(() => {
-    return subscribeXdsMode(setXds);
-  }, []);
+  const xds = useXdsMode();
 
   if (!xds) return null;
 

@@ -5,12 +5,39 @@ import { configDumpToLocalConfig } from "./configMapper";
 
 const API_URL = process.env.NODE_ENV === "production" ? "" : "http://localhost:15000";
 
+let xdsMode = false;
+let xdsModeKnown = false;
+
 export function isXdsMode() {
   return xdsMode;
 }
 
-let xdsMode = false;
-let xdsModeKnown = false;
+export function isXdsModeKnown() {
+  return xdsModeKnown;
+}
+
+// If the mode has not yet been determined, makes a request to /config_dump
+// to establish it, broadcasting the result so that subscribers update as well.
+export async function ensureXdsModeLoaded(): Promise<boolean> {
+  if (xdsModeKnown) {
+    return xdsMode;
+  }
+
+  try {
+    const resp = await fetch(`${API_URL}/config_dump`);
+    if (resp.ok) {
+      const dumpJson = await resp.json();
+      const enabled = !!dumpJson?.config?.xds?.address;
+      setAndBroadcastXds(enabled);
+      return enabled;
+    }
+  } catch (err) {
+    console.error("Failed to determine whether XDS mode is enabled", err);
+  }
+
+  // If we could not determine the mode, assume whatever default we currently have
+  return xdsMode;
+}
 
 type XdsSubscriber = (val: boolean) => void;
 const xdsSubscribers: XdsSubscriber[] = [];
@@ -153,7 +180,7 @@ function cleanupConfig(config: LocalConfig): LocalConfig {
  * Updates the configuration
  */
 export async function updateConfig(config: LocalConfig): Promise<void> {
-  if (isXdsMode()) {
+  if (await ensureXdsModeLoaded()) {
     throw new Error("Configuration is managed by XDS and cannot be updated via the UI.");
   }
   try {
