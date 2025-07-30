@@ -168,15 +168,16 @@ export const getBackendDetails = (backend: Backend): { primary: string; secondar
   }
 
   if (backend.host) {
-    const hostStr = typeof backend.host === "string" ? backend.host : String(backend.host.Hostname?.[0] ?? "");
-    if (hostStr.includes(":")) {
-      const [hostname, port] = hostStr.split(":");
-      return {
-        primary: `Host: ${hostname}`,
-        secondary: `Port: ${port}`,
-      };
+    if (typeof backend.host === "string") {
+      return { primary: `Address: ${backend.host}` };
+    } else if (backend.host?.Hostname) {
+      const hostname = String(backend.host.Hostname?.[0] ?? "");
+      const port = String(backend.host.Hostname?.[1] ?? "");
+      return { primary: `Host: ${hostname}`, secondary: `Port: ${port}` };
+    } else if (backend.host?.Address) {
+      return { primary: `Address: ${backend.host.Address}` };
     }
-    return { primary: `Address: ${hostStr}` };
+    return { primary: `""` };
   }
 
   if (backend.dynamic) {
