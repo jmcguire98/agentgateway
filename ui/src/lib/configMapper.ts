@@ -116,7 +116,14 @@ function mapToBackend(backendData: any): Backend | undefined {
 }
 
 function mapToRouteBackend(rb: any, backends: Backend[]): Backend | undefined {
-  return backends.find((b) => getBackendName(b) === rb.backend);
+  if (rb.backend) {
+    const found = backends.find((b) => getBackendName(b) === rb.backend);
+    if (found) return found;
+  }
+
+  // Fallback: instantiate a backend in-place based on the route backend data
+  // This covers cases where service/host backends are defined directly inside the route
+  return mapToBackend(rb);
 }
 
 function getBackendName(backend: Backend): string {
@@ -128,9 +135,30 @@ function getBackendName(backend: Backend): string {
 }
 
 function mapToServiceBackend(data: any): ServiceBackend | undefined {
-  if (!data?.name || typeof data.port !== "number") return undefined;
+  if (!data || typeof data.port !== "number") return undefined;
+
+  let namespace = "";
+  let hostname = "";
+
+  if (typeof data.name === "string") {
+    // Handle formats like "default/httpbin" or fully qualified hostnames
+    if (data.name.includes("/")) {
+      const parts = data.name.split("/");
+      namespace = parts[0];
+      hostname = parts.slice(1).join("/");
+    } else if (data.name.includes(".")) {
+      // Possibly a FQDN like "httpbin.default.svc.cluster.local" – treat first segment as hostname
+      hostname = data.name.split(".")[0];
+    } else {
+      hostname = data.name;
+    }
+  } else if (typeof data.name === "object" && data.name !== null) {
+    namespace = data.name.namespace ?? "";
+    hostname = data.name.hostname ?? "";
+  }
+
   return {
-    name: { namespace: data.name.namespace, hostname: data.name.hostname },
+    name: { namespace, hostname },
     port: data.port,
   } as ServiceBackend;
 }
