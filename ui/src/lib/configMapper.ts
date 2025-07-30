@@ -340,11 +340,14 @@ function mapToMcpConnectionTarget(data: any): McpConnectionTarget | undefined {
 }
 
 function mapToAiBackend(data: any): AiBackend | undefined {
-  if (!data?.name || !data.provider) return undefined;
+  if (!data?.name) return undefined;
+  const providerData = data.target?.provider;
+  const hostOverrideRaw = data.target?.hostOverride;
+  if (!providerData) return undefined;
   return {
     name: data.name,
-    provider: data.provider,
-    hostOverride: data.hostOverride ? mapToHostBackend(data.hostOverride) : undefined,
+    provider: providerData,
+    hostOverride: hostOverrideRaw ? mapToHostBackend(hostOverrideRaw) : undefined,
   } as AiBackend;
 }
 

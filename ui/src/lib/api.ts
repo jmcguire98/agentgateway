@@ -235,8 +235,7 @@ export async function fetchMcpTargets(): Promise<any[]> {
     config.binds.forEach((bind: Bind) => {
       bind.listeners.forEach((listener: Listener) => {
         listener.routes?.forEach((route: Route) => {
-          route.backends.forEach((backend: Backend) => {
-            console.log("backend", backend);
+          route.backends?.forEach((backend: Backend) => {
             if (backend?.mcp) {
               mcpTargets.push(...backend.mcp.targets);
             }
@@ -264,8 +263,8 @@ export async function fetchA2aTargets(): Promise<any[]> {
     config.binds.forEach((bind: Bind) => {
       bind.listeners.forEach((listener: Listener) => {
         listener.routes?.forEach((route: Route) => {
-          route.backends.forEach((backend: Backend) => {
-            if (backend.ai) {
+          route.backends?.forEach((backend: Backend) => {
+            if (backend?.ai) {
               a2aTargets.push(backend.ai);
             }
           });
