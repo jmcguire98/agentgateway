@@ -12,6 +12,7 @@ import {
   HostBackend,
   McpBackend,
   McpTarget,
+  ServiceBackend,
   TargetFilter,
   StdioTarget,
   SseTarget,
@@ -108,6 +109,7 @@ function mapToBackend(backendData: any): Backend | undefined {
   const backend: Backend = {} as Backend;
   if (typeof backendData.weight === "number") backend.weight = backendData.weight;
   else if (backendData.host) backend.host = mapToHostBackend(backendData.host);
+  if (backendData.service) backend.service = mapToServiceBackend(backendData.service);
   else if (backendData.mcp) backend.mcp = mapToMcpBackend(backendData.mcp);
   else if (backendData.ai) backend.ai = mapToAiBackend(backendData.ai);
   return backend;
@@ -118,10 +120,19 @@ function mapToRouteBackend(rb: any, backends: Backend[]): Backend | undefined {
 }
 
 function getBackendName(backend: Backend): string {
+  if (backend.service) return `${backend.service.name.namespace}/${backend.service.name.hostname}:${backend.service.port}`;
   if (backend.host) return backend.host.name ?? "";
   if (backend.mcp) return backend.mcp.name;
   if (backend.ai) return backend.ai.name;
   return "";
+}
+
+function mapToServiceBackend(data: any): ServiceBackend | undefined {
+  if (!data?.name || typeof data.port !== "number") return undefined;
+  return {
+    name: { namespace: data.name.namespace, hostname: data.name.hostname },
+    port: data.port,
+  } as ServiceBackend;
 }
 
 function mapToHostBackend(data: any): HostBackend | undefined {
