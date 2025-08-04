@@ -127,7 +127,8 @@ function mapToRouteBackend(rb: any, backends: Backend[]): Backend | undefined {
 }
 
 function getBackendName(backend: Backend): string {
-  if (backend.service) return `${backend.service.name.namespace}/${backend.service.name.hostname}:${backend.service.port}`;
+  if (backend.service)
+    return `${backend.service.name.namespace}/${backend.service.name.hostname}:${backend.service.port}`;
   if (backend.host) return backend.host.name ?? "";
   if (backend.mcp) return backend.mcp.name;
   if (backend.ai) return backend.ai.name;

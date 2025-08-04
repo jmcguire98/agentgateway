@@ -2,94 +2,42 @@ import { Target, Listener, LocalConfig, Bind, Backend, Route } from "./types";
 
 // Mapping utilities are centralized in configMapper
 import { configDumpToLocalConfig } from "./configMapper";
+import {
+  isXdsMode,
+  ensureXdsModeLoaded,
+  fetchConfigDump,
+  subscribeXdsMode,
+} from "@/hooks/use-xds-mode";
 
 const API_URL = process.env.NODE_ENV === "production" ? "" : "http://localhost:15000";
 
-let xdsMode = false;
-let xdsModeKnown = false;
-
-export function isXdsMode() {
-  return xdsMode;
-}
-
-export function isXdsModeKnown() {
-  return xdsModeKnown;
-}
-
-// If the mode has not yet been determined, makes a request to /config_dump
-// to establish it, broadcasting the result so that subscribers update as well.
-export async function ensureXdsModeLoaded(): Promise<boolean> {
-  if (xdsModeKnown) {
-    return xdsMode;
-  }
-
-  try {
-    const resp = await fetch(`${API_URL}/config_dump`);
-    if (resp.ok) {
-      const dumpJson = await resp.json();
-      const enabled = !!dumpJson?.config?.xds?.address;
-      setAndBroadcastXds(enabled);
-      return enabled;
-    }
-  } catch (err) {
-    console.error("Failed to determine whether XDS mode is enabled", err);
-  }
-
-  // If we could not determine the mode, assume whatever default we currently have
-  return xdsMode;
-}
-
-type XdsSubscriber = (val: boolean) => void;
-const xdsSubscribers: XdsSubscriber[] = [];
-
-function setAndBroadcastXds(val: boolean) {
-  if (xdsMode !== val) {
-    xdsMode = val;
-    xdsSubscribers.forEach((cb) => cb(val));
-  }
-  xdsModeKnown = true;
-}
-
-export function subscribeXdsMode(cb: XdsSubscriber) {
-  xdsSubscribers.push(cb);
-  return () => {
-    const idx = xdsSubscribers.indexOf(cb);
-    if (idx >= 0) xdsSubscribers.splice(idx, 1);
-  };
-}
+let currentXdsMode = isXdsMode();
+subscribeXdsMode((xdsMode) => {
+  currentXdsMode = xdsMode;
+});
 
 /**
  * Fetches the full configuration from the agentgateway server
  */
 export async function fetchConfig(): Promise<LocalConfig> {
   try {
-    if (xdsModeKnown) {
-      return xdsMode ? fetchViaDump() : fetchViaConfig();
-    }
+    // Ensure XDS mode is determined first
+    await ensureXdsModeLoaded();
 
-    const dumpResp = await fetch(`${API_URL}/config_dump`);
-    if (dumpResp.ok) {
-      const dumpJson = await dumpResp.json();
-      if (dumpJson?.config?.xds?.address) {
-        setAndBroadcastXds(true);
-        return configDumpToLocalConfig(dumpJson);
-      }
-
-      setAndBroadcastXds(false);
+    if (currentXdsMode) {
+      // if xds mode is enabled, fetch the config from the configdump endpoint, since nothing is stored in the config file
+      return fetchViaDump();
+    } else {
       return fetchViaConfig();
     }
-
-    setAndBroadcastXds(false);
-    return fetchViaConfig();
   } catch (error) {
     console.error("Error fetching config:", error);
     throw error;
   }
 
   async function fetchViaDump(): Promise<LocalConfig> {
-    const r = await fetch(`${API_URL}/config_dump`);
-    if (!r.ok) throw new Error(`Failed to fetch config dump: ${r.status}`);
-    return configDumpToLocalConfig(await r.json());
+    const dumpJson = await fetchConfigDump(API_URL);
+    return configDumpToLocalConfig(dumpJson);
   }
 
   async function fetchViaConfig(): Promise<LocalConfig> {
@@ -178,7 +126,7 @@ function cleanupConfig(config: LocalConfig): LocalConfig {
  * Updates the configuration
  */
 export async function updateConfig(config: LocalConfig): Promise<void> {
-  if (await ensureXdsModeLoaded()) {
+  if (currentXdsMode) {
     throw new Error("Configuration is managed by XDS and cannot be updated via the UI.");
   }
   try {
