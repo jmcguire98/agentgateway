@@ -15,13 +15,13 @@ use crate::{client, *};
 #[apply(schema!)]
 pub struct Policy {
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	prompt_guard: Option<PromptGuard>,
+	pub prompt_guard: Option<PromptGuard>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	defaults: Option<HashMap<String, serde_json::Value>>,
+	pub defaults: Option<HashMap<String, serde_json::Value>>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	overrides: Option<HashMap<String, serde_json::Value>>,
+	pub overrides: Option<HashMap<String, serde_json::Value>>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	prompts: Option<PromptEnrichment>,
+	pub prompts: Option<PromptEnrichment>,
 }
 
 #[apply(schema!)]
@@ -42,7 +42,7 @@ pub struct PromptEnrichment {
 
 #[apply(schema!)]
 pub struct PromptGuard {
-	request: Option<PromptGuardRequest>,
+	pub request: Option<PromptGuardRequest>,
 }
 impl Policy {
 	pub fn apply_prompt_enrichment(
@@ -219,20 +219,20 @@ impl Policy {
 #[apply(schema!)]
 pub struct PromptGuardRequest {
 	#[serde(default)]
-	response: PromptGuardResponse,
+	pub response: PromptGuardResponse,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	regex: Option<RegexRules>,
+	pub regex: Option<RegexRules>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	webhook: Option<Webhook>,
+	pub webhook: Option<Webhook>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	openai_moderation: Option<Moderation>,
+	pub openai_moderation: Option<Moderation>,
 }
 
 #[apply(schema!)]
 pub struct RegexRules {
 	#[serde(default)]
-	action: Action,
-	rules: Vec<RegexRule>,
+	pub action: Action,
+	pub rules: Vec<RegexRule>,
 }
 
 #[apply(schema!)]
@@ -283,7 +283,7 @@ pub struct NamedRegex {
 
 #[apply(schema!)]
 pub struct Webhook {
-	target: Target,
+	pub target: Target,
 	// TODO: headers
 }
 
@@ -291,8 +291,8 @@ pub struct Webhook {
 pub struct Moderation {
 	/// Model to use. Defaults to `omni-moderation-latest`
 	#[serde(default, skip_serializing_if = "Option::is_none")]
-	model: Option<Strng>,
-	auth: SimpleBackendAuth,
+	pub model: Option<Strng>,
+	pub auth: SimpleBackendAuth,
 }
 
 #[apply(schema!)]
@@ -309,10 +309,10 @@ pub enum Action {
 #[apply(schema!)]
 pub struct PromptGuardResponse {
 	#[serde(default = "default_body", serialize_with = "ser_string_or_bytes")]
-	body: Bytes,
+	pub body: Bytes,
 	#[serde(default = "default_code", with = "http_serde::status_code")]
 	#[cfg_attr(feature = "schema", schemars(with = "std::num::NonZeroU16"))]
-	status: StatusCode,
+	pub status: StatusCode,
 }
 
 impl Default for PromptGuardResponse {
