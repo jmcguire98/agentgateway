@@ -25,7 +25,7 @@ pub mod bedrock;
 pub mod gemini;
 pub mod openai;
 mod pii;
-mod policy;
+pub mod policy;
 #[cfg(test)]
 mod tests;
 mod universal;
