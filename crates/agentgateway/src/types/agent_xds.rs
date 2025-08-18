@@ -686,8 +686,16 @@ impl TryFrom<&proto::agent::Policy> for TargetedPolicy {
 					};
 
 					let regex = reqp.regex.as_ref().map(|rr| {
-						let action = match rr.action.as_ref().and_then(|a| proto::agent::policy_spec::ai::ActionKind::try_from(a.kind).ok()) {
-							Some(proto::agent::policy_spec::ai::ActionKind::Reject) => crate::llm::policy::Action::Reject { response: response.clone() },
+						let action = match rr
+							.action
+							.as_ref()
+							.and_then(|a| proto::agent::policy_spec::ai::ActionKind::try_from(a.kind).ok())
+						{
+							Some(proto::agent::policy_spec::ai::ActionKind::Reject) => {
+								crate::llm::policy::Action::Reject {
+									response: response.clone(),
+								}
+							},
 							_ => crate::llm::policy::Action::Mask,
 						};
 						let rules = rr
@@ -698,30 +706,41 @@ impl TryFrom<&proto::agent::Policy> for TargetedPolicy {
 									match proto::agent::policy_spec::ai::BuiltinRegexRule::try_from(*b) {
 										Ok(builtin) => {
 											let builtin = match builtin {
-																							proto::agent::policy_spec::ai::BuiltinRegexRule::Ssn => crate::llm::policy::Builtin::Ssn,
-											proto::agent::policy_spec::ai::BuiltinRegexRule::CreditCard => crate::llm::policy::Builtin::CreditCard,
-											proto::agent::policy_spec::ai::BuiltinRegexRule::PhoneNumber => crate::llm::policy::Builtin::PhoneNumber,
-											proto::agent::policy_spec::ai::BuiltinRegexRule::Email => crate::llm::policy::Builtin::Email,
+												proto::agent::policy_spec::ai::BuiltinRegexRule::Ssn => {
+													crate::llm::policy::Builtin::Ssn
+												},
+												proto::agent::policy_spec::ai::BuiltinRegexRule::CreditCard => {
+													crate::llm::policy::Builtin::CreditCard
+												},
+												proto::agent::policy_spec::ai::BuiltinRegexRule::PhoneNumber => {
+													crate::llm::policy::Builtin::PhoneNumber
+												},
+												proto::agent::policy_spec::ai::BuiltinRegexRule::Email => {
+													crate::llm::policy::Builtin::Email
+												},
 												_ => {
 													warn!(value = *b, "Unknown builtin regex rule, skipping");
 													return None;
-												}
+												},
 											};
 											Some(crate::llm::policy::RegexRule::Builtin { builtin })
 										},
 										Err(_) => {
 											warn!(value = *b, "Invalid builtin regex rule value, skipping");
 											None
-										}
+										},
 									}
 								},
 								Some(proto::agent::policy_spec::ai::regex_rule::Kind::Regex(n)) => {
 									match regex::Regex::new(&n.pattern) {
-										Ok(pattern) => Some(crate::llm::policy::RegexRule::Regex { pattern, name: n.name.clone() }),
+										Ok(pattern) => Some(crate::llm::policy::RegexRule::Regex {
+											pattern,
+											name: n.name.clone(),
+										}),
 										Err(err) => {
 											warn!(error = %err, name = %n.name, pattern = %n.pattern, "Invalid regex pattern");
 											None
-										}
+										},
 									}
 								},
 								None => None,
@@ -730,26 +749,35 @@ impl TryFrom<&proto::agent::Policy> for TargetedPolicy {
 						crate::llm::policy::RegexRules { action, rules }
 					});
 
-					let webhook = reqp.webhook.as_ref().and_then(|w| {
-						match u16::try_from(w.port) {
+					let webhook = reqp
+						.webhook
+						.as_ref()
+						.and_then(|w| match u16::try_from(w.port) {
 							Ok(port) => Some(crate::llm::policy::Webhook {
 								target: Target::Hostname(w.host.clone().into(), port),
 							}),
 							Err(_) => {
 								warn!(port = w.port, host = %w.host, "Webhook port out of range, ignoring webhook");
 								None
-							}
-						}
-					});
+							},
+						});
 
-					let openai_moderation = reqp.openai_moderation.as_ref().map(|m| crate::llm::policy::Moderation {
-						model: m.model.as_deref().map(strng::new),
-						auth: match m.auth.as_ref().and_then(|a| a.kind.clone()) {
-							Some(crate::types::proto::agent::backend_auth_policy::Kind::Passthrough(_)) => SimpleBackendAuth::Passthrough {},
-							Some(crate::types::proto::agent::backend_auth_policy::Kind::Key(k)) => SimpleBackendAuth::Key(k.secret.into()),
-							_ => SimpleBackendAuth::Passthrough {},
-						},
-					});
+					let openai_moderation =
+						reqp
+							.openai_moderation
+							.as_ref()
+							.map(|m| crate::llm::policy::Moderation {
+								model: m.model.as_deref().map(strng::new),
+								auth: match m.auth.as_ref().and_then(|a| a.kind.clone()) {
+									Some(crate::types::proto::agent::backend_auth_policy::Kind::Passthrough(_)) => {
+										SimpleBackendAuth::Passthrough {}
+									},
+									Some(crate::types::proto::agent::backend_auth_policy::Kind::Key(k)) => {
+										SimpleBackendAuth::Key(k.secret.into())
+									},
+									_ => SimpleBackendAuth::Passthrough {},
+								},
+							});
 
 					Some(crate::llm::policy::PromptGuard {
 						request: Some(crate::llm::policy::PromptGuardRequest {
@@ -761,7 +789,12 @@ impl TryFrom<&proto::agent::Policy> for TargetedPolicy {
 					})
 				});
 
-				Policy::AI(llm::Policy { prompt_guard, defaults: None, overrides: None, prompts: None })
+				Policy::AI(llm::Policy {
+					prompt_guard,
+					defaults: None,
+					overrides: None,
+					prompts: None,
+				})
 			},
 			_ => return Err(ProtoError::EnumParse("unknown spec kind".to_string())),
 		};
