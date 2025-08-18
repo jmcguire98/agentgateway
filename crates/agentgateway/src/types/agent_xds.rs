@@ -726,7 +726,7 @@ impl TryFrom<&proto::agent::Policy> for TargetedPolicy {
 					})
 				});
 
-				Policy::AI(llm::Policy {
+				Policy::AI(Box::new(llm::Policy {
 					prompt_guard,
 					defaults: Some(
 						ai.defaults
@@ -741,7 +741,7 @@ impl TryFrom<&proto::agent::Policy> for TargetedPolicy {
 							.collect(),
 					),
 					prompts: ai.prompts.as_ref().map(convert_prompt_enrichment),
-				})
+				}))
 			},
 			_ => return Err(ProtoError::EnumParse("unknown spec kind".to_string())),
 		};

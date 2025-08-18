@@ -260,7 +260,7 @@ impl Store {
 					pol.backend_auth.get_or_insert_with(|| p.clone());
 				},
 				Policy::AI(p) => {
-					pol.llm.get_or_insert_with(|| p.clone());
+					pol.llm.get_or_insert_with(|| *p.clone());
 				},
 				Policy::InferenceRouting(p) => {
 					pol.inference_routing.get_or_insert_with(|| p.clone());
