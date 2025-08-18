@@ -3526,8 +3526,7 @@ func (x *PolicySpec_LocalRateLimit) GetType() PolicySpec_LocalRateLimit_Type {
 }
 
 type PolicySpec_Ai struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Optional
+	state         protoimpl.MessageState     `protogen:"open.v1"`
 	PromptGuard   *PolicySpec_Ai_PromptGuard `protobuf:"bytes,1,opt,name=prompt_guard,json=promptGuard,proto3" json:"prompt_guard,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -4178,14 +4177,11 @@ func (x *PolicySpec_Ai_Moderation) GetAuth() *BackendAuthPolicy {
 }
 
 type PolicySpec_Ai_PromptGuardRequest struct {
-	state    protoimpl.MessageState             `protogen:"open.v1"`
-	Response *PolicySpec_Ai_PromptGuardResponse `protobuf:"bytes,1,opt,name=response,proto3" json:"response,omitempty"`
-	// Optional
-	Regex *PolicySpec_Ai_RegexRules `protobuf:"bytes,2,opt,name=regex,proto3" json:"regex,omitempty"`
-	// Optional
-	Webhook *PolicySpec_Ai_Webhook `protobuf:"bytes,3,opt,name=webhook,proto3" json:"webhook,omitempty"`
-	// Optional
-	OpenaiModeration *PolicySpec_Ai_Moderation `protobuf:"bytes,4,opt,name=openai_moderation,json=openaiModeration,proto3" json:"openai_moderation,omitempty"`
+	state            protoimpl.MessageState             `protogen:"open.v1"`
+	Response         *PolicySpec_Ai_PromptGuardResponse `protobuf:"bytes,1,opt,name=response,proto3" json:"response,omitempty"`
+	Regex            *PolicySpec_Ai_RegexRules          `protobuf:"bytes,2,opt,name=regex,proto3" json:"regex,omitempty"`
+	Webhook          *PolicySpec_Ai_Webhook             `protobuf:"bytes,3,opt,name=webhook,proto3" json:"webhook,omitempty"`
+	OpenaiModeration *PolicySpec_Ai_Moderation          `protobuf:"bytes,4,opt,name=openai_moderation,json=openaiModeration,proto3" json:"openai_moderation,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -4249,8 +4245,7 @@ func (x *PolicySpec_Ai_PromptGuardRequest) GetOpenaiModeration() *PolicySpec_Ai_
 }
 
 type PolicySpec_Ai_PromptGuard struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Optional
+	state         protoimpl.MessageState            `protogen:"open.v1"`
 	Request       *PolicySpec_Ai_PromptGuardRequest `protobuf:"bytes,1,opt,name=request,proto3" json:"request,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
