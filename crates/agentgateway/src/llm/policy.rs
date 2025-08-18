@@ -292,6 +292,7 @@ pub struct Moderation {
 	/// Model to use. Defaults to `omni-moderation-latest`
 	#[serde(default, skip_serializing_if = "Option::is_none")]
 	pub model: Option<Strng>,
+	#[serde(serialize_with = "ser_redact")]
 	pub auth: SimpleBackendAuth,
 }
 

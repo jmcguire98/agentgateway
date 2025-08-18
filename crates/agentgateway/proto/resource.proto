@@ -264,11 +264,6 @@ message PolicySpec {
     Type type = 4;
   }
   message Ai {
-    message PromptGuardResponse {
-      bytes body = 1;
-      uint32 status = 2;
-    }
-
     enum BuiltinRegexRule {
       BUILTIN_UNSPECIFIED = 0;
       SSN = 1;
@@ -315,6 +310,11 @@ message PolicySpec {
       // Model to use. Defaults to `omni-moderation-latest`
       google.protobuf.StringValue model = 1;
       BackendAuthPolicy auth = 2;
+    }
+
+    message PromptGuardResponse {
+      bytes body = 1;
+      uint32 status = 2;
     }
 
     message PromptGuardRequest {
