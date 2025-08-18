@@ -263,6 +263,73 @@ message PolicySpec {
     google.protobuf.Duration fill_interval = 3;
     Type type = 4;
   }
+  message Ai {
+    message PromptGuardResponse {
+      bytes body = 1;
+      uint32 status = 2;
+    }
+
+    enum BuiltinRegexRule {
+      BUILTIN_UNSPECIFIED = 0;
+      SSN = 1;
+      CREDIT_CARD = 2;
+      PHONE_NUMBER = 3;
+      EMAIL = 4;
+    }
+
+    message NamedRegex {
+      string pattern = 1;
+      string name = 2;
+    }
+
+    message RegexRule {
+      oneof kind {
+        BuiltinRegexRule builtin = 1;
+        NamedRegex regex = 2;
+      }
+    }
+
+    enum ActionKind {
+      ACTION_UNSPECIFIED = 0;
+      MASK = 1;
+      REJECT = 2;
+    }
+
+    message Action {
+      ActionKind kind = 1;
+      // Only used when kind == REJECT
+      PromptGuardResponse reject_response = 2;
+    }
+
+    message RegexRules {
+      Action action = 1;
+      repeated RegexRule rules = 2;
+    }
+
+    message Webhook {
+      string host = 1;
+      uint32 port = 2;
+    }
+
+    message Moderation {
+      // Model to use. Defaults to `omni-moderation-latest`
+      google.protobuf.StringValue model = 1;
+      BackendAuthPolicy auth = 2;
+    }
+
+    message PromptGuardRequest {
+      PromptGuardResponse response = 1;
+      RegexRules regex = 2;
+      Webhook webhook = 3;
+      Moderation openai_moderation = 4;
+    }
+
+    message PromptGuard {
+      PromptGuardRequest request = 1;
+    }
+
+    PromptGuard prompt_guard = 1;
+  }
   message ExternalAuth {
     BackendReference target = 1;
     map<string, string> context = 2;
@@ -294,6 +361,7 @@ message PolicySpec {
     InferenceRouting inference_routing = 4;
     BackendTLS backend_tls = 5;
     BackendAuthPolicy auth = 6;
+    Ai ai = 7;
   }
 }
 
