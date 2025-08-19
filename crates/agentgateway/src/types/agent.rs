@@ -996,10 +996,11 @@ pub enum Policy {
 	// Supported targets: Backend; single policy allowed
 	BackendAuth(BackendAuth),
 	// Supported targets: Backend; single policy allowed
+	InferenceRouting(ext_proc::InferenceRouting),
+
+	// Supported targets: Gateway < Route < RouteRule; single policy allowed
 	#[serde(rename = "ai")]
 	AI(Box<llm::Policy>),
-	// Supported targets: Backend; single policy allowed
-	InferenceRouting(ext_proc::InferenceRouting),
 
 	// Supported targets: Gateway < Route < RouteRule; single policy allowed
 	Authorization(Authorization),

@@ -54,7 +54,6 @@ pub struct BackendPolicies {
 	// bool represents "should use default settings for provider"
 	// second bool represents "tokenize"
 	pub llm_provider: Option<(llm::AIProvider, bool, bool)>,
-	pub llm: Option<llm::Policy>,
 	pub inference_routing: Option<InferenceRouting>,
 }
 
@@ -65,7 +64,6 @@ impl BackendPolicies {
 			backend_tls: other.backend_tls.or(self.backend_tls),
 			backend_auth: other.backend_auth.or(self.backend_auth),
 			a2a: other.a2a.or(self.a2a),
-			llm: other.llm.or(self.llm),
 			llm_provider: other.llm_provider.or(self.llm_provider),
 			inference_routing: other.inference_routing.or(self.inference_routing),
 		}
@@ -88,6 +86,7 @@ pub struct RoutePolicies {
 	pub jwt: Option<http::jwt::Jwt>,
 	pub ext_authz: Option<ext_authz::ExtAuthz>,
 	pub transformation: Option<http::transformation_cel::Transformation>,
+	pub llm: Option<Box<llm::Policy>>,
 }
 
 impl RoutePolicies {
@@ -118,6 +117,7 @@ impl From<RoutePolicies> for LLMRequestPolicies {
 				.filter(|r| r.limit_type == http::localratelimit::RateLimitType::Tokens)
 				.cloned()
 				.collect(),
+			llm: value.llm.clone(),
 		}
 	}
 }
@@ -126,6 +126,7 @@ impl From<RoutePolicies> for LLMRequestPolicies {
 pub struct LLMRequestPolicies {
 	pub local_rate_limit: Vec<http::localratelimit::RateLimit>,
 	pub remote_rate_limit: Option<http::remoteratelimit::RemoteRateLimit>,
+	pub llm: Option<Box<llm::Policy>>,
 }
 
 #[derive(Debug, Default)]
@@ -180,6 +181,7 @@ impl Store {
 		let route = self.policies_by_target.get(&PolicyTarget::Route(route));
 		let route_rule =
 			route_rule.and_then(|rr| self.policies_by_target.get(&PolicyTarget::RouteRule(rr)));
+		info!("Looking up route policies for route_rule={:?}, route={:?}, listener={:?}, gateway={:?}", route_rule, route, listener, gateway);
 		let rules = route_rule
 			.iter()
 			.copied()
@@ -187,7 +189,11 @@ impl Store {
 			.chain(route.iter().copied().flatten())
 			.chain(listener.iter().copied().flatten())
 			.chain(gateway.iter().copied().flatten())
-			.filter_map(|n| self.policies_by_name.get(n));
+			.filter_map(|n| {
+				let policy = self.policies_by_name.get(n);
+				info!("Found policy for name {:?}: {:?}", n, policy);
+				policy
+			});
 
 		let mut authz = Vec::new();
 		let mut pol = RoutePolicies {
@@ -197,6 +203,7 @@ impl Store {
 			ext_authz: None,
 			transformation: None,
 			authorization: None,
+			llm: None,
 		};
 		for rule in rules {
 			match &rule.policy {
@@ -221,6 +228,9 @@ impl Store {
 					// Authorization policies merge, unlike others
 					authz.push(p.clone().0);
 				},
+				Policy::AI(p) => {
+					pol.llm.get_or_insert_with(|| Box::new(*p.clone()));
+				},
 				_ => {}, // others are not route policies
 			}
 		}
@@ -243,7 +253,6 @@ impl Store {
 			backend_tls: None,
 			backend_auth: None,
 			a2a: None,
-			llm: None,
 			inference_routing: None,
 			// These are not attached policies but are represented in this struct for code organization
 			llm_provider: None,
@@ -258,9 +267,6 @@ impl Store {
 				},
 				Policy::BackendAuth(p) => {
 					pol.backend_auth.get_or_insert_with(|| p.clone());
-				},
-				Policy::AI(p) => {
-					pol.llm.get_or_insert_with(|| *p.clone());
 				},
 				Policy::InferenceRouting(p) => {
 					pol.inference_routing.get_or_insert_with(|| p.clone());
@@ -463,13 +469,16 @@ impl Store {
         fields(pol=%pol.name),
     )]
 	pub fn insert_policy(&mut self, pol: TargetedPolicy) {
+		info!("Inserting policy: {:?}", pol);
 		let pol = Arc::new(pol);
 		if let Some(old) = self.policies_by_name.insert(pol.name.clone(), pol.clone()) {
+			info!("Replacing existing policy with same name: {:?}", old);
 			// Remove the old target. We may add it back, though.
 			if let Some(o) = self.policies_by_target.get_mut(&old.target) {
 				o.remove(&pol.name);
 			}
 		}
+		info!("Adding policy to target map: target={:?}, name={:?}", pol.target, pol.name);
 		self
 			.policies_by_target
 			.entry(pol.target.clone())

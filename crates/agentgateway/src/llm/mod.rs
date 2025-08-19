@@ -129,7 +129,6 @@ impl AIProvider {
 			// We will use original request for now
 			backend_auth: None,
 			a2a: None,
-			llm: None,
 			inference_routing: None,
 			llm_provider: None,
 		};
@@ -141,7 +140,6 @@ impl AIProvider {
 					backend_tls: Some(http::backendtls::SYSTEM_TRUST.clone()),
 					backend_auth: Some(BackendAuth::Gcp {}),
 					a2a: None,
-					llm: None,
 					inference_routing: None,
 					llm_provider: None,
 				};
@@ -153,7 +151,6 @@ impl AIProvider {
 					backend_tls: Some(http::backendtls::SYSTEM_TRUST.clone()),
 					backend_auth: Some(BackendAuth::Aws(AwsAuth::Implicit {})),
 					a2a: None,
-					llm: None,
 					inference_routing: None,
 					llm_provider: None,
 				};
