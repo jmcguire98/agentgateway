@@ -3864,58 +3864,6 @@ func (x *PolicySpec_RBAC) GetDeny() []string {
 	return nil
 }
 
-type PolicySpec_Ai_PromptGuardResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Body          []byte                 `protobuf:"bytes,1,opt,name=body,proto3" json:"body,omitempty"`
-	Status        uint32                 `protobuf:"varint,2,opt,name=status,proto3" json:"status,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *PolicySpec_Ai_PromptGuardResponse) Reset() {
-	*x = PolicySpec_Ai_PromptGuardResponse{}
-	mi := &file_resource_proto_msgTypes[45]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PolicySpec_Ai_PromptGuardResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PolicySpec_Ai_PromptGuardResponse) ProtoMessage() {}
-
-func (x *PolicySpec_Ai_PromptGuardResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_resource_proto_msgTypes[45]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PolicySpec_Ai_PromptGuardResponse.ProtoReflect.Descriptor instead.
-func (*PolicySpec_Ai_PromptGuardResponse) Descriptor() ([]byte, []int) {
-	return file_resource_proto_rawDescGZIP(), []int{30, 1, 0}
-}
-
-func (x *PolicySpec_Ai_PromptGuardResponse) GetBody() []byte {
-	if x != nil {
-		return x.Body
-	}
-	return nil
-}
-
-func (x *PolicySpec_Ai_PromptGuardResponse) GetStatus() uint32 {
-	if x != nil {
-		return x.Status
-	}
-	return 0
-}
-
 type PolicySpec_Ai_NamedRegex struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Pattern       string                 `protobuf:"bytes,1,opt,name=pattern,proto3" json:"pattern,omitempty"`
@@ -3926,7 +3874,7 @@ type PolicySpec_Ai_NamedRegex struct {
 
 func (x *PolicySpec_Ai_NamedRegex) Reset() {
 	*x = PolicySpec_Ai_NamedRegex{}
-	mi := &file_resource_proto_msgTypes[46]
+	mi := &file_resource_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3938,7 +3886,7 @@ func (x *PolicySpec_Ai_NamedRegex) String() string {
 func (*PolicySpec_Ai_NamedRegex) ProtoMessage() {}
 
 func (x *PolicySpec_Ai_NamedRegex) ProtoReflect() protoreflect.Message {
-	mi := &file_resource_proto_msgTypes[46]
+	mi := &file_resource_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3951,7 +3899,7 @@ func (x *PolicySpec_Ai_NamedRegex) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PolicySpec_Ai_NamedRegex.ProtoReflect.Descriptor instead.
 func (*PolicySpec_Ai_NamedRegex) Descriptor() ([]byte, []int) {
-	return file_resource_proto_rawDescGZIP(), []int{30, 1, 1}
+	return file_resource_proto_rawDescGZIP(), []int{30, 1, 0}
 }
 
 func (x *PolicySpec_Ai_NamedRegex) GetPattern() string {
@@ -3981,7 +3929,7 @@ type PolicySpec_Ai_RegexRule struct {
 
 func (x *PolicySpec_Ai_RegexRule) Reset() {
 	*x = PolicySpec_Ai_RegexRule{}
-	mi := &file_resource_proto_msgTypes[47]
+	mi := &file_resource_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3993,7 +3941,7 @@ func (x *PolicySpec_Ai_RegexRule) String() string {
 func (*PolicySpec_Ai_RegexRule) ProtoMessage() {}
 
 func (x *PolicySpec_Ai_RegexRule) ProtoReflect() protoreflect.Message {
-	mi := &file_resource_proto_msgTypes[47]
+	mi := &file_resource_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4006,7 +3954,7 @@ func (x *PolicySpec_Ai_RegexRule) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PolicySpec_Ai_RegexRule.ProtoReflect.Descriptor instead.
 func (*PolicySpec_Ai_RegexRule) Descriptor() ([]byte, []int) {
-	return file_resource_proto_rawDescGZIP(), []int{30, 1, 2}
+	return file_resource_proto_rawDescGZIP(), []int{30, 1, 1}
 }
 
 func (x *PolicySpec_Ai_RegexRule) GetKind() isPolicySpec_Ai_RegexRule_Kind {
@@ -4061,7 +4009,7 @@ type PolicySpec_Ai_Action struct {
 
 func (x *PolicySpec_Ai_Action) Reset() {
 	*x = PolicySpec_Ai_Action{}
-	mi := &file_resource_proto_msgTypes[48]
+	mi := &file_resource_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4073,7 +4021,7 @@ func (x *PolicySpec_Ai_Action) String() string {
 func (*PolicySpec_Ai_Action) ProtoMessage() {}
 
 func (x *PolicySpec_Ai_Action) ProtoReflect() protoreflect.Message {
-	mi := &file_resource_proto_msgTypes[48]
+	mi := &file_resource_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4086,7 +4034,7 @@ func (x *PolicySpec_Ai_Action) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PolicySpec_Ai_Action.ProtoReflect.Descriptor instead.
 func (*PolicySpec_Ai_Action) Descriptor() ([]byte, []int) {
-	return file_resource_proto_rawDescGZIP(), []int{30, 1, 3}
+	return file_resource_proto_rawDescGZIP(), []int{30, 1, 2}
 }
 
 func (x *PolicySpec_Ai_Action) GetKind() PolicySpec_Ai_ActionKind {
@@ -4113,7 +4061,7 @@ type PolicySpec_Ai_RegexRules struct {
 
 func (x *PolicySpec_Ai_RegexRules) Reset() {
 	*x = PolicySpec_Ai_RegexRules{}
-	mi := &file_resource_proto_msgTypes[49]
+	mi := &file_resource_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4125,7 +4073,7 @@ func (x *PolicySpec_Ai_RegexRules) String() string {
 func (*PolicySpec_Ai_RegexRules) ProtoMessage() {}
 
 func (x *PolicySpec_Ai_RegexRules) ProtoReflect() protoreflect.Message {
-	mi := &file_resource_proto_msgTypes[49]
+	mi := &file_resource_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4138,7 +4086,7 @@ func (x *PolicySpec_Ai_RegexRules) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PolicySpec_Ai_RegexRules.ProtoReflect.Descriptor instead.
 func (*PolicySpec_Ai_RegexRules) Descriptor() ([]byte, []int) {
-	return file_resource_proto_rawDescGZIP(), []int{30, 1, 4}
+	return file_resource_proto_rawDescGZIP(), []int{30, 1, 3}
 }
 
 func (x *PolicySpec_Ai_RegexRules) GetAction() *PolicySpec_Ai_Action {
@@ -4165,7 +4113,7 @@ type PolicySpec_Ai_Webhook struct {
 
 func (x *PolicySpec_Ai_Webhook) Reset() {
 	*x = PolicySpec_Ai_Webhook{}
-	mi := &file_resource_proto_msgTypes[50]
+	mi := &file_resource_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4177,7 +4125,7 @@ func (x *PolicySpec_Ai_Webhook) String() string {
 func (*PolicySpec_Ai_Webhook) ProtoMessage() {}
 
 func (x *PolicySpec_Ai_Webhook) ProtoReflect() protoreflect.Message {
-	mi := &file_resource_proto_msgTypes[50]
+	mi := &file_resource_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4190,7 +4138,7 @@ func (x *PolicySpec_Ai_Webhook) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PolicySpec_Ai_Webhook.ProtoReflect.Descriptor instead.
 func (*PolicySpec_Ai_Webhook) Descriptor() ([]byte, []int) {
-	return file_resource_proto_rawDescGZIP(), []int{30, 1, 5}
+	return file_resource_proto_rawDescGZIP(), []int{30, 1, 4}
 }
 
 func (x *PolicySpec_Ai_Webhook) GetHost() string {
@@ -4218,7 +4166,7 @@ type PolicySpec_Ai_Moderation struct {
 
 func (x *PolicySpec_Ai_Moderation) Reset() {
 	*x = PolicySpec_Ai_Moderation{}
-	mi := &file_resource_proto_msgTypes[51]
+	mi := &file_resource_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4230,7 +4178,7 @@ func (x *PolicySpec_Ai_Moderation) String() string {
 func (*PolicySpec_Ai_Moderation) ProtoMessage() {}
 
 func (x *PolicySpec_Ai_Moderation) ProtoReflect() protoreflect.Message {
-	mi := &file_resource_proto_msgTypes[51]
+	mi := &file_resource_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4243,7 +4191,7 @@ func (x *PolicySpec_Ai_Moderation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PolicySpec_Ai_Moderation.ProtoReflect.Descriptor instead.
 func (*PolicySpec_Ai_Moderation) Descriptor() ([]byte, []int) {
-	return file_resource_proto_rawDescGZIP(), []int{30, 1, 6}
+	return file_resource_proto_rawDescGZIP(), []int{30, 1, 5}
 }
 
 func (x *PolicySpec_Ai_Moderation) GetModel() *wrappers.StringValue {
@@ -4258,6 +4206,58 @@ func (x *PolicySpec_Ai_Moderation) GetAuth() *BackendAuthPolicy {
 		return x.Auth
 	}
 	return nil
+}
+
+type PolicySpec_Ai_PromptGuardResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Body          []byte                 `protobuf:"bytes,1,opt,name=body,proto3" json:"body,omitempty"`
+	Status        uint32                 `protobuf:"varint,2,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PolicySpec_Ai_PromptGuardResponse) Reset() {
+	*x = PolicySpec_Ai_PromptGuardResponse{}
+	mi := &file_resource_proto_msgTypes[51]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PolicySpec_Ai_PromptGuardResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PolicySpec_Ai_PromptGuardResponse) ProtoMessage() {}
+
+func (x *PolicySpec_Ai_PromptGuardResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_resource_proto_msgTypes[51]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PolicySpec_Ai_PromptGuardResponse.ProtoReflect.Descriptor instead.
+func (*PolicySpec_Ai_PromptGuardResponse) Descriptor() ([]byte, []int) {
+	return file_resource_proto_rawDescGZIP(), []int{30, 1, 6}
+}
+
+func (x *PolicySpec_Ai_PromptGuardResponse) GetBody() []byte {
+	if x != nil {
+		return x.Body
+	}
+	return nil
+}
+
+func (x *PolicySpec_Ai_PromptGuardResponse) GetStatus() uint32 {
+	if x != nil {
+		return x.Status
+	}
+	return 0
 }
 
 type PolicySpec_Ai_PromptGuardRequest struct {
@@ -4865,10 +4865,7 @@ const file_resource_proto_rawDesc = "" +
 	"\aREQUEST\x10\x00\x12\t\n" +
 	"\x05TOKEN\x10\x01\x1a\x9b\f\n" +
 	"\x02Ai\x12W\n" +
-	"\fprompt_guard\x18\x01 \x01(\v24.agentgateway.dev.resource.PolicySpec.Ai.PromptGuardR\vpromptGuard\x1aA\n" +
-	"\x13PromptGuardResponse\x12\x12\n" +
-	"\x04body\x18\x01 \x01(\fR\x04body\x12\x16\n" +
-	"\x06status\x18\x02 \x01(\rR\x06status\x1a:\n" +
+	"\fprompt_guard\x18\x01 \x01(\v24.agentgateway.dev.resource.PolicySpec.Ai.PromptGuardR\vpromptGuard\x1a:\n" +
 	"\n" +
 	"NamedRegex\x12\x18\n" +
 	"\apattern\x18\x01 \x01(\tR\apattern\x12\x12\n" +
@@ -4890,7 +4887,10 @@ const file_resource_proto_rawDesc = "" +
 	"\n" +
 	"Moderation\x122\n" +
 	"\x05model\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x05model\x12@\n" +
-	"\x04auth\x18\x02 \x01(\v2,.agentgateway.dev.resource.BackendAuthPolicyR\x04auth\x1a\xe7\x02\n" +
+	"\x04auth\x18\x02 \x01(\v2,.agentgateway.dev.resource.BackendAuthPolicyR\x04auth\x1aA\n" +
+	"\x13PromptGuardResponse\x12\x12\n" +
+	"\x04body\x18\x01 \x01(\fR\x04body\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\rR\x06status\x1a\xe7\x02\n" +
 	"\x12PromptGuardRequest\x12X\n" +
 	"\bresponse\x18\x01 \x01(\v2<.agentgateway.dev.resource.PolicySpec.Ai.PromptGuardResponseR\bresponse\x12I\n" +
 	"\x05regex\x18\x02 \x01(\v23.agentgateway.dev.resource.PolicySpec.Ai.RegexRulesR\x05regex\x12J\n" +
@@ -5071,13 +5071,13 @@ var file_resource_proto_goTypes = []any{
 	(*PolicySpec_InferenceRouting)(nil),          // 49: agentgateway.dev.resource.PolicySpec.InferenceRouting
 	(*PolicySpec_BackendTLS)(nil),                // 50: agentgateway.dev.resource.PolicySpec.BackendTLS
 	(*PolicySpec_RBAC)(nil),                      // 51: agentgateway.dev.resource.PolicySpec.RBAC
-	(*PolicySpec_Ai_PromptGuardResponse)(nil),    // 52: agentgateway.dev.resource.PolicySpec.Ai.PromptGuardResponse
-	(*PolicySpec_Ai_NamedRegex)(nil),             // 53: agentgateway.dev.resource.PolicySpec.Ai.NamedRegex
-	(*PolicySpec_Ai_RegexRule)(nil),              // 54: agentgateway.dev.resource.PolicySpec.Ai.RegexRule
-	(*PolicySpec_Ai_Action)(nil),                 // 55: agentgateway.dev.resource.PolicySpec.Ai.Action
-	(*PolicySpec_Ai_RegexRules)(nil),             // 56: agentgateway.dev.resource.PolicySpec.Ai.RegexRules
-	(*PolicySpec_Ai_Webhook)(nil),                // 57: agentgateway.dev.resource.PolicySpec.Ai.Webhook
-	(*PolicySpec_Ai_Moderation)(nil),             // 58: agentgateway.dev.resource.PolicySpec.Ai.Moderation
+	(*PolicySpec_Ai_NamedRegex)(nil),             // 52: agentgateway.dev.resource.PolicySpec.Ai.NamedRegex
+	(*PolicySpec_Ai_RegexRule)(nil),              // 53: agentgateway.dev.resource.PolicySpec.Ai.RegexRule
+	(*PolicySpec_Ai_Action)(nil),                 // 54: agentgateway.dev.resource.PolicySpec.Ai.Action
+	(*PolicySpec_Ai_RegexRules)(nil),             // 55: agentgateway.dev.resource.PolicySpec.Ai.RegexRules
+	(*PolicySpec_Ai_Webhook)(nil),                // 56: agentgateway.dev.resource.PolicySpec.Ai.Webhook
+	(*PolicySpec_Ai_Moderation)(nil),             // 57: agentgateway.dev.resource.PolicySpec.Ai.Moderation
+	(*PolicySpec_Ai_PromptGuardResponse)(nil),    // 58: agentgateway.dev.resource.PolicySpec.Ai.PromptGuardResponse
 	(*PolicySpec_Ai_PromptGuardRequest)(nil),     // 59: agentgateway.dev.resource.PolicySpec.Ai.PromptGuardRequest
 	(*PolicySpec_Ai_PromptGuard)(nil),            // 60: agentgateway.dev.resource.PolicySpec.Ai.PromptGuard
 	nil,                                          // 61: agentgateway.dev.resource.PolicySpec.ExternalAuth.ContextEntry
@@ -5169,17 +5169,17 @@ var file_resource_proto_depIdxs = []int32{
 	69, // 73: agentgateway.dev.resource.PolicySpec.BackendTLS.root:type_name -> google.protobuf.BytesValue
 	70, // 74: agentgateway.dev.resource.PolicySpec.BackendTLS.insecure:type_name -> google.protobuf.BoolValue
 	2,  // 75: agentgateway.dev.resource.PolicySpec.Ai.RegexRule.builtin:type_name -> agentgateway.dev.resource.PolicySpec.Ai.BuiltinRegexRule
-	53, // 76: agentgateway.dev.resource.PolicySpec.Ai.RegexRule.regex:type_name -> agentgateway.dev.resource.PolicySpec.Ai.NamedRegex
+	52, // 76: agentgateway.dev.resource.PolicySpec.Ai.RegexRule.regex:type_name -> agentgateway.dev.resource.PolicySpec.Ai.NamedRegex
 	3,  // 77: agentgateway.dev.resource.PolicySpec.Ai.Action.kind:type_name -> agentgateway.dev.resource.PolicySpec.Ai.ActionKind
-	52, // 78: agentgateway.dev.resource.PolicySpec.Ai.Action.reject_response:type_name -> agentgateway.dev.resource.PolicySpec.Ai.PromptGuardResponse
-	55, // 79: agentgateway.dev.resource.PolicySpec.Ai.RegexRules.action:type_name -> agentgateway.dev.resource.PolicySpec.Ai.Action
-	54, // 80: agentgateway.dev.resource.PolicySpec.Ai.RegexRules.rules:type_name -> agentgateway.dev.resource.PolicySpec.Ai.RegexRule
+	58, // 78: agentgateway.dev.resource.PolicySpec.Ai.Action.reject_response:type_name -> agentgateway.dev.resource.PolicySpec.Ai.PromptGuardResponse
+	54, // 79: agentgateway.dev.resource.PolicySpec.Ai.RegexRules.action:type_name -> agentgateway.dev.resource.PolicySpec.Ai.Action
+	53, // 80: agentgateway.dev.resource.PolicySpec.Ai.RegexRules.rules:type_name -> agentgateway.dev.resource.PolicySpec.Ai.RegexRule
 	71, // 81: agentgateway.dev.resource.PolicySpec.Ai.Moderation.model:type_name -> google.protobuf.StringValue
 	15, // 82: agentgateway.dev.resource.PolicySpec.Ai.Moderation.auth:type_name -> agentgateway.dev.resource.BackendAuthPolicy
-	52, // 83: agentgateway.dev.resource.PolicySpec.Ai.PromptGuardRequest.response:type_name -> agentgateway.dev.resource.PolicySpec.Ai.PromptGuardResponse
-	56, // 84: agentgateway.dev.resource.PolicySpec.Ai.PromptGuardRequest.regex:type_name -> agentgateway.dev.resource.PolicySpec.Ai.RegexRules
-	57, // 85: agentgateway.dev.resource.PolicySpec.Ai.PromptGuardRequest.webhook:type_name -> agentgateway.dev.resource.PolicySpec.Ai.Webhook
-	58, // 86: agentgateway.dev.resource.PolicySpec.Ai.PromptGuardRequest.openai_moderation:type_name -> agentgateway.dev.resource.PolicySpec.Ai.Moderation
+	58, // 83: agentgateway.dev.resource.PolicySpec.Ai.PromptGuardRequest.response:type_name -> agentgateway.dev.resource.PolicySpec.Ai.PromptGuardResponse
+	55, // 84: agentgateway.dev.resource.PolicySpec.Ai.PromptGuardRequest.regex:type_name -> agentgateway.dev.resource.PolicySpec.Ai.RegexRules
+	56, // 85: agentgateway.dev.resource.PolicySpec.Ai.PromptGuardRequest.webhook:type_name -> agentgateway.dev.resource.PolicySpec.Ai.Webhook
+	57, // 86: agentgateway.dev.resource.PolicySpec.Ai.PromptGuardRequest.openai_moderation:type_name -> agentgateway.dev.resource.PolicySpec.Ai.Moderation
 	59, // 87: agentgateway.dev.resource.PolicySpec.Ai.PromptGuard.request:type_name -> agentgateway.dev.resource.PolicySpec.Ai.PromptGuardRequest
 	71, // 88: agentgateway.dev.resource.AIBackend.OpenAI.model:type_name -> google.protobuf.StringValue
 	71, // 89: agentgateway.dev.resource.AIBackend.Gemini.model:type_name -> google.protobuf.StringValue
@@ -5283,7 +5283,7 @@ func file_resource_proto_init() {
 		(*BackendReference_Service)(nil),
 		(*BackendReference_Backend)(nil),
 	}
-	file_resource_proto_msgTypes[47].OneofWrappers = []any{
+	file_resource_proto_msgTypes[46].OneofWrappers = []any{
 		(*PolicySpec_Ai_RegexRule_Builtin)(nil),
 		(*PolicySpec_Ai_RegexRule_Regex)(nil),
 	}

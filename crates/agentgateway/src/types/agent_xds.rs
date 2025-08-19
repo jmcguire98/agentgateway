@@ -5,8 +5,8 @@ use std::sync::Arc;
 use rustls::ServerConfig;
 
 use super::agent::*;
-use crate::http::auth::{AwsAuth, BackendAuth, };
-use crate::http::{StatusCode, backendtls, ext_proc, filters, localratelimit, uri};
+use crate::http::auth::{AwsAuth, BackendAuth, SimpleBackendAuth};
+use crate::http::{StatusCode, authorization, backendtls, ext_proc, filters, localratelimit, uri};
 use crate::llm::{AIBackend, AIProvider};
 use crate::mcp::rbac::McpAuthorization;
 use crate::types::discovery::NamespacedHostname;
