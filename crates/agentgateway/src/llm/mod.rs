@@ -28,7 +28,7 @@ mod pii;
 pub mod policy;
 #[cfg(test)]
 mod tests;
-mod universal;
+pub mod universal;
 pub mod vertex;
 
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]

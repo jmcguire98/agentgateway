@@ -31,18 +31,21 @@ pub struct PromptEnrichment {
 		feature = "schema",
 		schemars(with = "crate::llm::SimpleChatCompletionMessage")
 	)]
-	append: Vec<ChatCompletionRequestMessage>,
+	pub append: Vec<ChatCompletionRequestMessage>,
 	#[serde(default, skip_serializing_if = "Vec::is_empty")]
 	#[cfg_attr(
 		feature = "schema",
 		schemars(with = "crate::llm::SimpleChatCompletionMessage")
 	)]
-	prepend: Vec<ChatCompletionRequestMessage>,
+	pub prepend: Vec<ChatCompletionRequestMessage>,
 }
 
 #[apply(schema!)]
 pub struct PromptGuard {
-	pub request: Option<PromptGuardRequest>,
+	// Guards applied to client requests before they reach the LLM
+	pub request: Option<RequestGuard>,
+	// Guards applied to LLM responses before they reach the client
+	pub response: Option<ResponseGuard>,
 }
 impl Policy {
 	pub fn apply_prompt_enrichment(
@@ -117,7 +120,7 @@ impl Policy {
 			let resp: async_openai::types::CreateModerationResponse =
 				json::from_body(resp?.into_body()).await?;
 			if resp.results.iter().any(|r| r.flagged) {
-				return Ok(Some(g.response.as_response()));
+				return Ok(Some(g.rejection.as_response()));
 			}
 		}
 		if let Some(webhook) = &g.webhook {
@@ -217,9 +220,9 @@ impl Policy {
 }
 
 #[apply(schema!)]
-pub struct PromptGuardRequest {
+pub struct RequestGuard {
 	#[serde(default)]
-	pub response: PromptGuardResponse,
+	pub rejection: RequestRejection,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
 	pub regex: Option<RegexRules>,
 	#[serde(default, skip_serializing_if = "Option::is_none")]
@@ -249,7 +252,7 @@ pub enum RegexRule {
 	},
 }
 
-impl PromptGuardResponse {
+impl RequestRejection {
 	pub fn as_response(&self) -> Response {
 		::http::response::Builder::new()
 			.status(self.status)
@@ -303,12 +306,12 @@ pub enum Action {
 	Mask,
 	Reject {
 		#[serde(default)]
-		response: PromptGuardResponse,
+		response: RequestRejection,
 	},
 }
 
 #[apply(schema!)]
-pub struct PromptGuardResponse {
+pub struct RequestRejection {
 	#[serde(default = "default_body", serialize_with = "ser_string_or_bytes")]
 	pub body: Bytes,
 	#[serde(default = "default_code", with = "http_serde::status_code")]
@@ -316,13 +319,21 @@ pub struct PromptGuardResponse {
 	pub status: StatusCode,
 }
 
-impl Default for PromptGuardResponse {
+impl Default for RequestRejection {
 	fn default() -> Self {
 		Self {
 			body: default_body(),
 			status: default_code(),
 		}
 	}
+}
+
+#[apply(schema!)]
+pub struct ResponseGuard {
+	#[serde(default, skip_serializing_if = "Option::is_none")]
+	pub regex: Option<RegexRules>,
+	#[serde(default, skip_serializing_if = "Option::is_none")]
+	pub webhook: Option<Webhook>,
 }
 
 #[apply(schema!)]
