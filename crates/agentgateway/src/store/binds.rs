@@ -181,7 +181,6 @@ impl Store {
 		let route = self.policies_by_target.get(&PolicyTarget::Route(route));
 		let route_rule =
 			route_rule.and_then(|rr| self.policies_by_target.get(&PolicyTarget::RouteRule(rr)));
-		info!("Looking up route policies for route_rule={:?}, route={:?}, listener={:?}, gateway={:?}", route_rule, route, listener, gateway);
 		let rules = route_rule
 			.iter()
 			.copied()
@@ -189,11 +188,7 @@ impl Store {
 			.chain(route.iter().copied().flatten())
 			.chain(listener.iter().copied().flatten())
 			.chain(gateway.iter().copied().flatten())
-			.filter_map(|n| {
-				let policy = self.policies_by_name.get(n);
-				info!("Found policy for name {:?}: {:?}", n, policy);
-				policy
-			});
+			.filter_map(|n| self.policies_by_name.get(n));
 
 		let mut authz = Vec::new();
 		let mut pol = RoutePolicies {
@@ -469,16 +464,13 @@ impl Store {
         fields(pol=%pol.name),
     )]
 	pub fn insert_policy(&mut self, pol: TargetedPolicy) {
-		info!("Inserting policy: {:?}", pol);
 		let pol = Arc::new(pol);
 		if let Some(old) = self.policies_by_name.insert(pol.name.clone(), pol.clone()) {
-			info!("Replacing existing policy with same name: {:?}", old);
 			// Remove the old target. We may add it back, though.
 			if let Some(o) = self.policies_by_target.get_mut(&old.target) {
 				o.remove(&pol.name);
 			}
 		}
-		info!("Adding policy to target map: target={:?}, name={:?}", pol.target, pol.name);
 		self
 			.policies_by_target
 			.entry(pol.target.clone())
