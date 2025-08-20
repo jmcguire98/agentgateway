@@ -86,7 +86,7 @@ pub struct RoutePolicies {
 	pub jwt: Option<http::jwt::Jwt>,
 	pub ext_authz: Option<ext_authz::ExtAuthz>,
 	pub transformation: Option<http::transformation_cel::Transformation>,
-	pub llm: Option<Box<llm::Policy>>,
+	pub llm: Option<Arc<llm::Policy>>,
 }
 
 impl RoutePolicies {
@@ -126,7 +126,7 @@ impl From<RoutePolicies> for LLMRequestPolicies {
 pub struct LLMRequestPolicies {
 	pub local_rate_limit: Vec<http::localratelimit::RateLimit>,
 	pub remote_rate_limit: Option<http::remoteratelimit::RemoteRateLimit>,
-	pub llm: Option<Box<llm::Policy>>,
+	pub llm: Option<Arc<llm::Policy>>,
 }
 
 #[derive(Debug, Default)]
@@ -224,7 +224,7 @@ impl Store {
 					authz.push(p.clone().0);
 				},
 				Policy::AI(p) => {
-					pol.llm.get_or_insert_with(|| Box::new(*p.clone()));
+					pol.llm.get_or_insert_with(|| p.clone());
 				},
 				_ => {}, // others are not route policies
 			}

@@ -1000,8 +1000,7 @@ pub enum Policy {
 
 	// Supported targets: Gateway < Route < RouteRule; single policy allowed
 	#[serde(rename = "ai")]
-	AI(Box<llm::Policy>),
-
+	AI(Arc<llm::Policy>),
 	// Supported targets: Gateway < Route < RouteRule; single policy allowed
 	Authorization(Authorization),
 	// Supported targets: Gateway < Route < RouteRule; single policy allowed

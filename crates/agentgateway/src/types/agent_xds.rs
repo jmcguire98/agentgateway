@@ -726,7 +726,7 @@ impl TryFrom<&proto::agent::Policy> for TargetedPolicy {
 					})
 				});
 
-				Policy::AI(Box::new(llm::Policy {
+				Policy::AI(Arc::new(llm::Policy {
 					prompt_guard,
 					defaults: Some(
 						ai.defaults
