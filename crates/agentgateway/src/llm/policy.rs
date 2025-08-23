@@ -173,11 +173,28 @@ impl Policy {
 			if let Some(rgx) = &g.regex {
 				for r in &rgx.rules {
 					match r {
-						RegexRule::Builtin { builtin } => match builtin {
-							Builtin::Ssn => pii::recognizer(pii::SSN.deref(), &content),
-							Builtin::CreditCard => pii::recognizer(pii::CC.deref(), &content),
-							Builtin::PhoneNumber => pii::recognizer(pii::PHONE.deref(), &content),
-							Builtin::Email => pii::recognizer(pii::EMAIL.deref(), &content),
+						RegexRule::Builtin { builtin } => {
+							let results = match builtin {
+								Builtin::Ssn => pii::recognizer(pii::SSN.deref(), &content),
+								Builtin::CreditCard => pii::recognizer(pii::CC.deref(), &content),
+								Builtin::PhoneNumber => pii::recognizer(pii::PHONE.deref(), &content),
+								Builtin::Email => pii::recognizer(pii::EMAIL.deref(), &content),
+							};
+							
+							if !results.is_empty() {
+								if let Action::Reject { response } = &rgx.action {
+									return Ok(Some(response.as_response()));
+								}
+								
+								let mut new_content = content.clone();
+								for result in results.iter().rev() {
+									new_content.replace_range(result.start..result.end, &format!("<{}>", result.entity_type));
+								}
+								*msg = Self::convert_message(Message {
+									role: universal::message_role(msg).to_string(),
+									content: new_content,
+								});
+							}
 						},
 						RegexRule::Regex { pattern, name } => {
 							if let Some(m) = pattern.find(&content) {
