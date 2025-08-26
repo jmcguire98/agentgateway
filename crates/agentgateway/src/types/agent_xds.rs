@@ -1,6 +1,5 @@
 use std::net::{IpAddr, SocketAddr};
 use std::num::NonZeroU16;
-use std::str::FromStr;
 use std::sync::Arc;
 
 use rustls::ServerConfig;
@@ -692,56 +691,12 @@ impl TryFrom<&proto::agent::PolicySpec> for Policy {
 					},
 				};
 
-				// Parse the JWKS JSON directly
 				let jwk_set: jsonwebtoken::jwk::JwkSet = serde_json::from_str(&jwks_json)
 					.map_err(|e| ProtoError::Generic(format!("failed to parse JWKS: {e}")))?;
 
-				// Build the Jwt struct directly (mimicking what LocalJwtConfig::try_into does)
-				let mut keys = std::collections::HashMap::new();
-
-				for jwk in jwk_set.keys {
-					if let Some(key_alg) = jwk
-						.common
-						.key_algorithm
-						.and_then(|alg| jsonwebtoken::Algorithm::from_str(&alg.to_string()).ok())
-					{
-						let kid = jwk
-							.common
-							.key_id
-							.clone()
-							.ok_or_else(|| ProtoError::Generic("JWK missing kid".to_string()))?;
-
-						let decoding_key = match &jwk.algorithm {
-							jsonwebtoken::jwk::AlgorithmParameters::RSA(rsa) => {
-								jsonwebtoken::DecodingKey::from_rsa_components(&rsa.n, &rsa.e)
-									.map_err(|e| ProtoError::Generic(format!("failed to create RSA key: {e}")))?
-							},
-							jsonwebtoken::jwk::AlgorithmParameters::EllipticCurve(ec) => {
-								jsonwebtoken::DecodingKey::from_ec_components(&ec.x, &ec.y)
-									.map_err(|e| ProtoError::Generic(format!("failed to create EC key: {e}")))?
-							},
-							other => {
-								return Err(ProtoError::Generic(format!(
-									"unsupported key algorithm: {other:?}"
-								)));
-							},
-						};
-
-						let mut validation = jsonwebtoken::Validation::new(key_alg);
-						validation.set_audience(&jwt.audiences);
-						validation.set_issuer(&[jwt.issuer.clone()]);
-
-						keys.insert(
-							kid,
-							http::jwt::Jwk {
-								decoding: decoding_key,
-								validation,
-							},
-						);
-					}
-				}
-
-				let jwt_auth = http::jwt::Jwt { mode, keys };
+				let jwt_auth =
+					http::jwt::Jwt::from_jwks(jwk_set, mode, jwt.issuer.clone(), jwt.audiences.clone())
+						.map_err(|e| ProtoError::Generic(format!("failed to create JWT config: {e}")))?;
 
 				Policy::JwtAuth(jwt_auth)
 			},
