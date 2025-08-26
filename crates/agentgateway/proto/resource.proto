@@ -414,11 +414,11 @@ message PolicySpec {
     // JWKS configuration - where to get the keys for validation
     oneof jwks_source {
       // Inline JWKS as a JSON string
-      string jwks_inline = 4;
+      string inline = 4;
       // Path to a file containing the JWKS
-      string jwks_file = 5;
+      string file = 5;
       // Remote URL to fetch JWKS from
-      string jwks_url = 6;
+      string url = 6;
     }
   }
   

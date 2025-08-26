@@ -674,13 +674,13 @@ impl TryFrom<&proto::agent::PolicySpec> for Policy {
 
 				// Parse JWKS based on source
 				let jwks_json = match &jwt.jwks_source {
-					Some(proto::agent::policy_spec::jwt::JwksSource::JwksInline(inline)) => inline.clone(),
-					Some(proto::agent::policy_spec::jwt::JwksSource::JwksFile(_)) => {
+					Some(proto::agent::policy_spec::jwt::JwksSource::Inline(inline)) => inline.clone(),
+					Some(proto::agent::policy_spec::jwt::JwksSource::File(_)) => {
 						return Err(ProtoError::Generic(
 							"JWT file-based JWKS not yet supported via XDS".to_string(),
 						));
 					},
-					Some(proto::agent::policy_spec::jwt::JwksSource::JwksUrl(_)) => {
+					Some(proto::agent::policy_spec::jwt::JwksSource::Url(_)) => {
 						return Err(ProtoError::Generic(
 							"JWT remote JWKS not yet supported via XDS".to_string(),
 						));
