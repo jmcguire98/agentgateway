@@ -56,8 +56,8 @@ pub enum JwkError {
 
 #[derive(Clone)]
 pub struct Jwt {
-	mode: Mode,
-	keys: HashMap<String, Jwk>,
+	pub mode: Mode,
+	pub keys: HashMap<String, Jwk>,
 }
 
 // TODO: can we give anything useful here?
@@ -176,9 +176,9 @@ impl LocalJwtConfig {
 }
 
 #[derive(Clone)]
-struct Jwk {
-	decoding: DecodingKey,
-	validation: Validation,
+pub struct Jwk {
+	pub decoding: DecodingKey,
+	pub validation: Validation,
 }
 
 #[derive(Clone, Debug, Default)]
