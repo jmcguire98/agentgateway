@@ -28,7 +28,10 @@ pub static SSN: Lazy<Box<dyn Recognizer + Sync + Send + 'static>> =
 	Lazy::new(|| Box::new(us_ssn_recognizer::UsSsnRecognizer::new()));
 
 #[allow(clippy::borrowed_box)]
-pub fn recognizer(r: &Box<dyn Recognizer + Sync + Send + 'static>, text: &str) -> Vec<recognizer_result::RecognizerResult> {
+pub fn recognizer(
+	r: &Box<dyn Recognizer + Sync + Send + 'static>,
+	text: &str,
+) -> Vec<recognizer_result::RecognizerResult> {
 	r.recognize(text)
 }
 

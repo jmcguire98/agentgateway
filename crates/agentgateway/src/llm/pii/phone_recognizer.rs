@@ -61,7 +61,7 @@ impl Recognizer for PhoneRecognizer {
 			results.sort_by_key(|r| (r.start, r.end));
 			let mut merged = Vec::new();
 			let mut current = results[0].clone();
-			
+
 			for result in results.into_iter().skip(1) {
 				// Check if overlapping or adjacent (within 1 character)
 				if result.start <= current.end + 1 {

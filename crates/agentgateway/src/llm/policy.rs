@@ -165,23 +165,23 @@ impl Policy {
 			let Some(original_content) = universal::message_text(msg) else {
 				continue;
 			};
-			
+
 			if let Some(rgx) = &g.regex {
 				let mut current_content = original_content.to_string();
 				let mut content_modified = false;
-				
+
 				// Process each rule sequentially, updating the content as we go
 				for r in &rgx.rules {
 					match r {
 						RegexRule::Builtin { builtin } => {
 							let rec = match builtin {
-								Builtin::Ssn         => &*pii::SSN,
-								Builtin::CreditCard  => &*pii::CC,
+								Builtin::Ssn => &*pii::SSN,
+								Builtin::CreditCard => &*pii::CC,
 								Builtin::PhoneNumber => &*pii::PHONE,
-								Builtin::Email       => &*pii::EMAIL,
+								Builtin::Email => &*pii::EMAIL,
 							};
 							let results = pii::recognizer(rec, &current_content);
-							
+
 							if !results.is_empty() {
 								match &rgx.action {
 									Action::Reject { response } => {
@@ -191,11 +191,11 @@ impl Policy {
 										// Sort in reverse to avoid index shifting during replacement
 										let mut sorted_results = results;
 										sorted_results.sort_by(|a, b| b.start.cmp(&a.start));
-										
+
 										for result in sorted_results {
 											current_content.replace_range(
-												result.start..result.end, 
-												&format!("<{}>", result.entity_type.to_uppercase())
+												result.start..result.end,
+												&format!("<{}>", result.entity_type.to_uppercase()),
 											);
 										}
 										content_modified = true;
@@ -204,11 +204,11 @@ impl Policy {
 							}
 						},
 						RegexRule::Regex { pattern, name } => {
-							let ranges: Vec<std::ops::Range<usize>> =
-							pattern.find_iter(&current_content)
-								   .map(|m| m.range())
-								   .collect();
-							
+							let ranges: Vec<std::ops::Range<usize>> = pattern
+								.find_iter(&current_content)
+								.map(|m| m.range())
+								.collect();
+
 							if !ranges.is_empty() {
 								match &rgx.action {
 									Action::Reject { response } => {
@@ -220,14 +220,13 @@ impl Policy {
 											current_content.replace_range(range, &format!("<{name}>"));
 										}
 										content_modified = true;
-						
 									},
 								}
 							}
 						},
 					}
 				}
-				
+
 				// Only update the message if content was actually modified
 				if content_modified {
 					*msg = Self::convert_message(Message {
