@@ -162,7 +162,7 @@ impl Jwt {
 
 				let mut validation = Validation::new(key_alg);
 				validation.set_audience(&audiences);
-				validation.set_issuer(&[issuer.clone()]);
+				validation.set_issuer(std::slice::from_ref(&issuer));
 
 				keys.insert(
 					kid,
