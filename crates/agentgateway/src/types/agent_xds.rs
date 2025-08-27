@@ -662,7 +662,6 @@ impl TryFrom<&proto::agent::PolicySpec> for Policy {
 				Policy::McpAuthorization(McpAuthorization::try_from(rbac)?)
 			},
 			Some(proto::agent::policy_spec::Kind::Jwt(jwt)) => {
-				// TODO: Support remote JWKS by deferring the fetch or using a different conversion path
 				let mode = match proto::agent::policy_spec::jwt::Mode::try_from(jwt.mode)
 					.map_err(|_| ProtoError::EnumParse("invalid JWT mode".to_string()))?
 				{
@@ -674,16 +673,6 @@ impl TryFrom<&proto::agent::PolicySpec> for Policy {
 				// Parse JWKS based on source
 				let jwks_json = match &jwt.jwks_source {
 					Some(proto::agent::policy_spec::jwt::JwksSource::Inline(inline)) => inline.clone(),
-					Some(proto::agent::policy_spec::jwt::JwksSource::File(_)) => {
-						return Err(ProtoError::Generic(
-							"JWT file-based JWKS not yet supported via XDS".to_string(),
-						));
-					},
-					Some(proto::agent::policy_spec::jwt::JwksSource::Url(_)) => {
-						return Err(ProtoError::Generic(
-							"JWT remote JWKS not yet supported via XDS".to_string(),
-						));
-					},
 					None => {
 						return Err(ProtoError::Generic(
 							"JWT policy missing JWKS source".to_string(),

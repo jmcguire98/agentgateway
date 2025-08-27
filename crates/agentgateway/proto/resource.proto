@@ -415,10 +415,6 @@ message PolicySpec {
     oneof jwks_source {
       // Inline JWKS as a JSON string
       string inline = 4;
-      // Path to a file containing the JWKS
-      string file = 5;
-      // Remote URL to fetch JWKS from
-      string url = 6;
     }
   }
   

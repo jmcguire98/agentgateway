@@ -4006,8 +4006,6 @@ type PolicySpec_JWT struct {
 	// Types that are valid to be assigned to JwksSource:
 	//
 	//	*PolicySpec_JWT_Inline
-	//	*PolicySpec_JWT_File
-	//	*PolicySpec_JWT_Url
 	JwksSource    isPolicySpec_JWT_JwksSource `protobuf_oneof:"jwks_source"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -4080,24 +4078,6 @@ func (x *PolicySpec_JWT) GetInline() string {
 	return ""
 }
 
-func (x *PolicySpec_JWT) GetFile() string {
-	if x != nil {
-		if x, ok := x.JwksSource.(*PolicySpec_JWT_File); ok {
-			return x.File
-		}
-	}
-	return ""
-}
-
-func (x *PolicySpec_JWT) GetUrl() string {
-	if x != nil {
-		if x, ok := x.JwksSource.(*PolicySpec_JWT_Url); ok {
-			return x.Url
-		}
-	}
-	return ""
-}
-
 type isPolicySpec_JWT_JwksSource interface {
 	isPolicySpec_JWT_JwksSource()
 }
@@ -4107,21 +4087,7 @@ type PolicySpec_JWT_Inline struct {
 	Inline string `protobuf:"bytes,4,opt,name=inline,proto3,oneof"`
 }
 
-type PolicySpec_JWT_File struct {
-	// Path to a file containing the JWKS
-	File string `protobuf:"bytes,5,opt,name=file,proto3,oneof"`
-}
-
-type PolicySpec_JWT_Url struct {
-	// Remote URL to fetch JWKS from
-	Url string `protobuf:"bytes,6,opt,name=url,proto3,oneof"`
-}
-
 func (*PolicySpec_JWT_Inline) isPolicySpec_JWT_JwksSource() {}
-
-func (*PolicySpec_JWT_File) isPolicySpec_JWT_JwksSource() {}
-
-func (*PolicySpec_JWT_Url) isPolicySpec_JWT_JwksSource() {}
 
 type PolicySpec_Ai_Message struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -5274,7 +5240,7 @@ const file_resource_proto_rawDesc = "" +
 	"route_rule\x18\x04 \x01(\tH\x00R\trouteRule\x12\x1a\n" +
 	"\abackend\x18\x05 \x01(\tH\x00R\abackend\x12\x1a\n" +
 	"\aservice\x18\x06 \x01(\tH\x00R\aserviceB\x06\n" +
-	"\x04kind\"\xf0#\n" +
+	"\x04kind\"\xc6#\n" +
 	"\n" +
 	"PolicySpec\x12`\n" +
 	"\x10local_rate_limit\x18\x01 \x01(\v24.agentgateway.dev.resource.PolicySpec.LocalRateLimitH\x00R\x0elocalRateLimit\x12Q\n" +
@@ -5386,14 +5352,12 @@ const file_resource_proto_rawDesc = "" +
 	"\bhostname\x18\x05 \x01(\v2\x1c.google.protobuf.StringValueR\bhostname\x1a0\n" +
 	"\x04RBAC\x12\x14\n" +
 	"\x05allow\x18\x01 \x03(\tR\x05allow\x12\x12\n" +
-	"\x04deny\x18\x02 \x03(\tR\x04deny\x1a\x84\x02\n" +
+	"\x04deny\x18\x02 \x03(\tR\x04deny\x1a\xda\x01\n" +
 	"\x03JWT\x12B\n" +
 	"\x04mode\x18\x01 \x01(\x0e2..agentgateway.dev.resource.PolicySpec.JWT.ModeR\x04mode\x12\x16\n" +
 	"\x06issuer\x18\x02 \x01(\tR\x06issuer\x12\x1c\n" +
 	"\taudiences\x18\x03 \x03(\tR\taudiences\x12\x18\n" +
-	"\x06inline\x18\x04 \x01(\tH\x00R\x06inline\x12\x14\n" +
-	"\x04file\x18\x05 \x01(\tH\x00R\x04file\x12\x12\n" +
-	"\x03url\x18\x06 \x01(\tH\x00R\x03url\"0\n" +
+	"\x06inline\x18\x04 \x01(\tH\x00R\x06inline\"0\n" +
 	"\x04Mode\x12\f\n" +
 	"\bOPTIONAL\x10\x00\x12\n" +
 	"\n" +
@@ -5774,8 +5738,6 @@ func file_resource_proto_init() {
 	}
 	file_resource_proto_msgTypes[45].OneofWrappers = []any{
 		(*PolicySpec_JWT_Inline)(nil),
-		(*PolicySpec_JWT_File)(nil),
-		(*PolicySpec_JWT_Url)(nil),
 	}
 	file_resource_proto_msgTypes[49].OneofWrappers = []any{
 		(*PolicySpec_Ai_RegexRule_Builtin)(nil),
