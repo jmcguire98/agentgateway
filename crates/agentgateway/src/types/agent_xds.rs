@@ -266,58 +266,72 @@ impl TryFrom<&proto::agent::Backend> for Backend {
 					.map_err(|e| ProtoError::Generic(e.to_string()))?,
 			),
 			Some(proto::agent::backend::Kind::Ai(a)) => {
-				let provider = match &a.provider {
-					Some(proto::agent::ai_backend::Provider::Openai(openai)) => {
-						AIProvider::OpenAI(llm::openai::Provider {
-							model: openai.model.as_deref().map(strng::new),
-						})
-					},
-					Some(proto::agent::ai_backend::Provider::Gemini(gemini)) => {
-						AIProvider::Gemini(llm::gemini::Provider {
-							model: gemini.model.as_deref().map(strng::new),
-						})
-					},
-					Some(proto::agent::ai_backend::Provider::Vertex(vertex)) => {
-						AIProvider::Vertex(llm::vertex::Provider {
-							model: vertex.model.as_deref().map(strng::new),
-							region: Some(strng::new(&vertex.region)),
-							project_id: strng::new(&vertex.project_id),
-						})
-					},
-					Some(proto::agent::ai_backend::Provider::Anthropic(anthropic)) => {
-						AIProvider::Anthropic(llm::anthropic::Provider {
-							model: anthropic.model.as_deref().map(strng::new),
-						})
-					},
-					Some(proto::agent::ai_backend::Provider::Bedrock(bedrock)) => {
-						AIProvider::Bedrock(llm::bedrock::Provider {
-							model: bedrock.model.as_deref().map(strng::new),
-							region: strng::new(&bedrock.region),
-							guardrail_identifier: bedrock.guardrail_identifier.as_deref().map(strng::new),
-							guardrail_version: bedrock.guardrail_version.as_deref().map(strng::new),
-						})
-					},
-					None => {
-						return Err(ProtoError::Generic(
-							"AI backend provider is required".to_string(),
-						));
-					},
-				};
-				let np = NamedAIProvider {
-					name: name.clone(),
-					provider,
-					tokenize: false,
-					path_override: a.path_override.as_ref().map(strng::new),
-					host_override: a
-						.r#override
-						.as_ref()
-						.map(|o| {
-							Target::try_from((o.host.as_str(), o.port as u16))
-								.map_err(|e| ProtoError::Generic(e.to_string()))
-						})
-						.transpose()?,
-				};
-				let es = crate::types::loadbalancer::EndpointSet::new(vec![vec![(name.clone(), np)]]);
+				if a.providers.is_empty() {
+					return Err(ProtoError::Generic(
+						"AI backend must have at least one provider".to_string(),
+					));
+				}
+
+				let path_override = a.path_override.as_ref().map(strng::new);
+				let mut providers = Vec::new();
+				for (idx, proto_provider) in a.providers.iter().enumerate() {
+					let provider = match &proto_provider.provider {
+						Some(proto::agent::ai_backend::provider::Provider::Openai(openai)) => {
+							AIProvider::OpenAI(llm::openai::Provider {
+								model: openai.model.as_deref().map(strng::new),
+							})
+						},
+						Some(proto::agent::ai_backend::provider::Provider::Gemini(gemini)) => {
+							AIProvider::Gemini(llm::gemini::Provider {
+								model: gemini.model.as_deref().map(strng::new),
+							})
+						},
+						Some(proto::agent::ai_backend::provider::Provider::Vertex(vertex)) => {
+							AIProvider::Vertex(llm::vertex::Provider {
+								model: vertex.model.as_deref().map(strng::new),
+								region: Some(strng::new(&vertex.region)),
+								project_id: strng::new(&vertex.project_id),
+							})
+						},
+						Some(proto::agent::ai_backend::provider::Provider::Anthropic(anthropic)) => {
+							AIProvider::Anthropic(llm::anthropic::Provider {
+								model: anthropic.model.as_deref().map(strng::new),
+							})
+						},
+						Some(proto::agent::ai_backend::provider::Provider::Bedrock(bedrock)) => {
+							AIProvider::Bedrock(llm::bedrock::Provider {
+								model: bedrock.model.as_deref().map(strng::new),
+								region: strng::new(&bedrock.region),
+								guardrail_identifier: bedrock.guardrail_identifier.as_deref().map(strng::new),
+								guardrail_version: bedrock.guardrail_version.as_deref().map(strng::new),
+							})
+						},
+						None => {
+							return Err(ProtoError::Generic(format!(
+								"AI backend provider at index {idx} is required"
+							)));
+						},
+					};
+
+					let provider_name = strng::new(format!("{name}_{idx}"));
+					let np = NamedAIProvider {
+						name: provider_name.clone(),
+						provider,
+						tokenize: false,
+						path_override: path_override.clone(),
+						host_override: proto_provider
+							.r#override
+							.as_ref()
+							.map(|o| {
+								Target::try_from((o.host.as_str(), o.port as u16))
+									.map_err(|e| ProtoError::Generic(e.to_string()))
+							})
+							.transpose()?,
+					};
+					providers.push(vec![(provider_name, np)]);
+				}
+
+				let es = crate::types::loadbalancer::EndpointSet::new(providers);
 				Backend::AI(name.clone(), AIBackend { providers: es })
 			},
 			Some(proto::agent::backend::Kind::Mcp(m)) => Backend::MCP(

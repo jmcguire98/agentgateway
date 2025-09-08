@@ -534,14 +534,18 @@ message AIBackend {
     google.protobuf.StringValue guardrail_identifier = 3;
     google.protobuf.StringValue guardrail_version = 4;
   }
-  oneof provider {
-    OpenAI openai = 2;
-    Gemini gemini = 3;
-    Vertex vertex = 4;
-    Anthropic anthropic = 5;
-    Bedrock bedrock = 6;
+  message Provider {
+    Override override = 1;
+    oneof provider {
+      OpenAI openai = 2;
+      Gemini gemini = 3;
+      Vertex vertex = 4;
+      Anthropic anthropic = 5;
+      Bedrock bedrock = 6;
+    }
   }
-  google.protobuf.StringValue path_override = 7;
+  repeated Provider providers = 2;
+  google.protobuf.StringValue path_override = 3;
 }
 
 message MCPBackend {
