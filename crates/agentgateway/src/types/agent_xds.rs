@@ -272,7 +272,6 @@ impl TryFrom<&proto::agent::Backend> for Backend {
 					));
 				}
 
-				let path_override = a.path_override.as_ref().map(strng::new);
 				let mut providers = Vec::new();
 				for (idx, proto_provider) in a.providers.iter().enumerate() {
 					let provider = match &proto_provider.provider {
@@ -318,7 +317,7 @@ impl TryFrom<&proto::agent::Backend> for Backend {
 						name: provider_name.clone(),
 						provider,
 						tokenize: false,
-						path_override: path_override.clone(),
+						path_override: proto_provider.path_override.as_ref().map(strng::new),
 						host_override: proto_provider
 							.r#override
 							.as_ref()
