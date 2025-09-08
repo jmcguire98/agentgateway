@@ -311,8 +311,11 @@ impl TryFrom<&proto::agent::Backend> for Backend {
 							)));
 						},
 					};
-
-					let provider_name = strng::new(format!("{name}_{idx}"));
+					let provider_name = if proto_provider.name.is_empty() {
+						strng::new(format!("{name}_{idx}"))
+					} else {
+						strng::new(&proto_provider.name)
+					};
 					let np = NamedAIProvider {
 						name: provider_name.clone(),
 						provider,

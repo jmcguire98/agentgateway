@@ -5627,8 +5627,9 @@ func (x *AIBackend_Bedrock) GetGuardrailVersion() *wrappers.StringValue {
 
 type AIBackend_Provider struct {
 	state        protoimpl.MessageState `protogen:"open.v1"`
-	Override     *AIBackend_Override    `protobuf:"bytes,1,opt,name=override,proto3" json:"override,omitempty"`
-	PathOverride *wrappers.StringValue  `protobuf:"bytes,2,opt,name=path_override,json=pathOverride,proto3" json:"path_override,omitempty"`
+	Name         string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Override     *AIBackend_Override    `protobuf:"bytes,2,opt,name=override,proto3" json:"override,omitempty"`
+	PathOverride *wrappers.StringValue  `protobuf:"bytes,3,opt,name=path_override,json=pathOverride,proto3" json:"path_override,omitempty"`
 	// Types that are valid to be assigned to Provider:
 	//
 	//	*AIBackend_Provider_Openai
@@ -5669,6 +5670,13 @@ func (x *AIBackend_Provider) ProtoReflect() protoreflect.Message {
 // Deprecated: Use AIBackend_Provider.ProtoReflect.Descriptor instead.
 func (*AIBackend_Provider) Descriptor() ([]byte, []int) {
 	return file_resource_proto_rawDescGZIP(), []int{34, 6}
+}
+
+func (x *AIBackend_Provider) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
 }
 
 func (x *AIBackend_Provider) GetOverride() *AIBackend_Override {
@@ -5742,23 +5750,23 @@ type isAIBackend_Provider_Provider interface {
 }
 
 type AIBackend_Provider_Openai struct {
-	Openai *AIBackend_OpenAI `protobuf:"bytes,3,opt,name=openai,proto3,oneof"`
+	Openai *AIBackend_OpenAI `protobuf:"bytes,4,opt,name=openai,proto3,oneof"`
 }
 
 type AIBackend_Provider_Gemini struct {
-	Gemini *AIBackend_Gemini `protobuf:"bytes,4,opt,name=gemini,proto3,oneof"`
+	Gemini *AIBackend_Gemini `protobuf:"bytes,5,opt,name=gemini,proto3,oneof"`
 }
 
 type AIBackend_Provider_Vertex struct {
-	Vertex *AIBackend_Vertex `protobuf:"bytes,5,opt,name=vertex,proto3,oneof"`
+	Vertex *AIBackend_Vertex `protobuf:"bytes,6,opt,name=vertex,proto3,oneof"`
 }
 
 type AIBackend_Provider_Anthropic struct {
-	Anthropic *AIBackend_Anthropic `protobuf:"bytes,6,opt,name=anthropic,proto3,oneof"`
+	Anthropic *AIBackend_Anthropic `protobuf:"bytes,7,opt,name=anthropic,proto3,oneof"`
 }
 
 type AIBackend_Provider_Bedrock struct {
-	Bedrock *AIBackend_Bedrock `protobuf:"bytes,7,opt,name=bedrock,proto3,oneof"`
+	Bedrock *AIBackend_Bedrock `protobuf:"bytes,8,opt,name=bedrock,proto3,oneof"`
 }
 
 func (*AIBackend_Provider_Openai) isAIBackend_Provider_Provider() {}
@@ -6120,7 +6128,7 @@ const file_resource_proto_rawDesc = "" +
 	"\x04kind\"7\n" +
 	"\rStaticBackend\x12\x12\n" +
 	"\x04host\x18\x01 \x01(\tR\x04host\x12\x12\n" +
-	"\x04port\x18\x02 \x01(\x05R\x04port\"\x93\n" +
+	"\x04port\x18\x02 \x01(\x05R\x04port\"\xa7\n" +
 	"\n" +
 	"\tAIBackend\x12I\n" +
 	"\boverride\x18\x01 \x01(\v2-.agentgateway.dev.resource.AIBackend.OverrideR\boverride\x12K\n" +
@@ -6143,15 +6151,16 @@ const file_resource_proto_rawDesc = "" +
 	"\x05model\x18\x01 \x01(\v2\x1c.google.protobuf.StringValueR\x05model\x12\x16\n" +
 	"\x06region\x18\x02 \x01(\tR\x06region\x12O\n" +
 	"\x14guardrail_identifier\x18\x03 \x01(\v2\x1c.google.protobuf.StringValueR\x13guardrailIdentifier\x12I\n" +
-	"\x11guardrail_version\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\x10guardrailVersion\x1a\x93\x04\n" +
-	"\bProvider\x12I\n" +
-	"\boverride\x18\x01 \x01(\v2-.agentgateway.dev.resource.AIBackend.OverrideR\boverride\x12A\n" +
-	"\rpath_override\x18\x02 \x01(\v2\x1c.google.protobuf.StringValueR\fpathOverride\x12E\n" +
-	"\x06openai\x18\x03 \x01(\v2+.agentgateway.dev.resource.AIBackend.OpenAIH\x00R\x06openai\x12E\n" +
-	"\x06gemini\x18\x04 \x01(\v2+.agentgateway.dev.resource.AIBackend.GeminiH\x00R\x06gemini\x12E\n" +
-	"\x06vertex\x18\x05 \x01(\v2+.agentgateway.dev.resource.AIBackend.VertexH\x00R\x06vertex\x12N\n" +
-	"\tanthropic\x18\x06 \x01(\v2..agentgateway.dev.resource.AIBackend.AnthropicH\x00R\tanthropic\x12H\n" +
-	"\abedrock\x18\a \x01(\v2,.agentgateway.dev.resource.AIBackend.BedrockH\x00R\abedrockB\n" +
+	"\x11guardrail_version\x18\x04 \x01(\v2\x1c.google.protobuf.StringValueR\x10guardrailVersion\x1a\xa7\x04\n" +
+	"\bProvider\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12I\n" +
+	"\boverride\x18\x02 \x01(\v2-.agentgateway.dev.resource.AIBackend.OverrideR\boverride\x12A\n" +
+	"\rpath_override\x18\x03 \x01(\v2\x1c.google.protobuf.StringValueR\fpathOverride\x12E\n" +
+	"\x06openai\x18\x04 \x01(\v2+.agentgateway.dev.resource.AIBackend.OpenAIH\x00R\x06openai\x12E\n" +
+	"\x06gemini\x18\x05 \x01(\v2+.agentgateway.dev.resource.AIBackend.GeminiH\x00R\x06gemini\x12E\n" +
+	"\x06vertex\x18\x06 \x01(\v2+.agentgateway.dev.resource.AIBackend.VertexH\x00R\x06vertex\x12N\n" +
+	"\tanthropic\x18\a \x01(\v2..agentgateway.dev.resource.AIBackend.AnthropicH\x00R\tanthropic\x12H\n" +
+	"\abedrock\x18\b \x01(\v2,.agentgateway.dev.resource.AIBackend.BedrockH\x00R\abedrockB\n" +
 	"\n" +
 	"\bprovider\"\xd2\x01\n" +
 	"\n" +

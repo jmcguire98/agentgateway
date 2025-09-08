@@ -535,14 +535,15 @@ message AIBackend {
     google.protobuf.StringValue guardrail_version = 4;
   }
   message Provider {
-    Override override = 1;
-    google.protobuf.StringValue path_override = 2;
+    string name = 1;
+    Override override = 2;
+    google.protobuf.StringValue path_override = 3;
     oneof provider {
-      OpenAI openai = 3;
-      Gemini gemini = 4;
-      Vertex vertex = 5;
-      Anthropic anthropic = 6;
-      Bedrock bedrock = 7;
+      OpenAI openai = 4;
+      Gemini gemini = 5;
+      Vertex vertex = 6;
+      Anthropic anthropic = 7;
+      Bedrock bedrock = 8;
     }
   }
   repeated Provider providers = 2;
