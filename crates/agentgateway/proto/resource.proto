@@ -509,11 +509,10 @@ message StaticBackend {
 }
 
 message AIBackend {
-  message Override {
+  message HostOverride {
     string host = 1;
     int32 port = 2;
   }
-  Override override = 1;
   message OpenAI {
     google.protobuf.StringValue model = 1;
   }
@@ -536,7 +535,7 @@ message AIBackend {
   }
   message Provider {
     string name = 1;
-    Override override = 2;
+    HostOverride host_override = 2;
     google.protobuf.StringValue path_override = 3;
     oneof provider {
       OpenAI openai = 4;
@@ -546,7 +545,10 @@ message AIBackend {
       Bedrock bedrock = 8;
     }
   }
-  repeated Provider providers = 2;
+  message ProviderGroup {
+    repeated Provider providers = 1;
+  }
+  repeated ProviderGroup provider_groups = 2;
 }
 
 message MCPBackend {
