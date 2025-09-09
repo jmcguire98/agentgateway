@@ -548,7 +548,7 @@ message AIBackend {
   message ProviderGroup {
     repeated Provider providers = 1;
   }
-  repeated ProviderGroup provider_groups = 2;
+  repeated ProviderGroup provider_groups = 1;
 }
 
 message MCPBackend {

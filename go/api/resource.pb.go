@@ -3373,7 +3373,7 @@ func (x *StaticBackend) GetPort() int32 {
 
 type AIBackend struct {
 	state          protoimpl.MessageState     `protogen:"open.v1"`
-	ProviderGroups []*AIBackend_ProviderGroup `protobuf:"bytes,2,rep,name=provider_groups,json=providerGroups,proto3" json:"provider_groups,omitempty"`
+	ProviderGroups []*AIBackend_ProviderGroup `protobuf:"bytes,1,rep,name=provider_groups,json=providerGroups,proto3" json:"provider_groups,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -6167,7 +6167,7 @@ const file_resource_proto_rawDesc = "" +
 	"\x04port\x18\x02 \x01(\x05R\x04port\"\xdb\n" +
 	"\n" +
 	"\tAIBackend\x12[\n" +
-	"\x0fprovider_groups\x18\x02 \x03(\v22.agentgateway.dev.resource.AIBackend.ProviderGroupR\x0eproviderGroups\x1a6\n" +
+	"\x0fprovider_groups\x18\x01 \x03(\v22.agentgateway.dev.resource.AIBackend.ProviderGroupR\x0eproviderGroups\x1a6\n" +
 	"\fHostOverride\x12\x12\n" +
 	"\x04host\x18\x01 \x01(\tR\x04host\x12\x12\n" +
 	"\x04port\x18\x02 \x01(\x05R\x04port\x1a<\n" +
