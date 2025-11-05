@@ -86,7 +86,7 @@ pub struct NamedAIProvider {
 const DEFAULT_ROUTE: &str = "*";
 impl NamedAIProvider {
 	pub fn use_default_policies(&self) -> bool {
-		self.host_override.is_none()
+		self.host_override.is_none() && self.path_override.is_none()
 	}
 	pub fn resolve_route(&self, path: &str) -> RouteType {
 		for (path_suffix, rt) in &self.routes {
