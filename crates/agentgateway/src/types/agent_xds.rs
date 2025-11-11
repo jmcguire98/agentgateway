@@ -103,14 +103,47 @@ impl TryFrom<&proto::agent::backend_policy_spec::McpAuthentication> for McpAuthe
 			_ => None,
 		};
 
+		let jwks_json = match &m.jwks_source {
+			Some(proto::agent::backend_policy_spec::mcp_authentication::JwksSource::JwksUrl(_)) => {
+				return Err(ProtoError::Generic(
+					"MCP Authentication via xDS does not support configuring jwks_url. \
+					The control plane should fetch the JWKS and provide it via jwks_inline instead."
+						.to_string(),
+				));
+			},
+			Some(proto::agent::backend_policy_spec::mcp_authentication::JwksSource::JwksInline(inline)) => {
+				inline.clone()
+			},
+			None => {
+				return Err(ProtoError::Generic(
+					"MCP Authentication requires jwks_source to be set. \
+					The control plane should fetch the JWKS and provide it via jwks_inline."
+						.to_string(),
+				));
+			},
+		};
+
+		let jwk_set: jsonwebtoken::jwk::JwkSet = serde_json::from_str(&jwks_json)
+			.map_err(|e| ProtoError::Generic(format!("failed to parse JWKS for MCP Authentication: {e}")))?;
+
+		let audiences = Some(vec![m.audience.clone()]);
+		let jwt_provider = http::jwt::Provider::from_jwks(jwk_set, m.issuer.clone(), audiences)
+			.map_err(|e| ProtoError::Generic(format!("failed to create JWT provider for MCP Authentication: {e}")))?;
+
+		// Create JWT validator with Optional mode (default for MCP auth)
+		let jwt_validator = http::jwt::Jwt::from_providers(vec![jwt_provider], http::jwt::Mode::Optional);
+
+		let jwks = FileInlineOrRemote::Inline(jwks_json);
+
 		Ok(McpAuthentication {
 			issuer: m.issuer.clone(),
 			audience: m.audience.clone(),
-			jwks_url: m.jwks_url.clone(),
 			provider,
 			resource_metadata: ResourceMetadata {
 				extra: Default::default(),
 			},
+			jwks,
+			jwt_validator: Some(jwt_validator),
 		})
 	}
 }
