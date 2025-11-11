@@ -309,14 +309,6 @@ pub enum FileInlineOrRemote {
 	},
 }
 
-impl Default for FileInlineOrRemote {
-	fn default() -> Self {
-		FileInlineOrRemote::Remote {
-			url: "".parse().unwrap(),
-		}
-	}
-}
-
 impl FileInlineOrRemote {
 	pub async fn load<T: DeserializeOwned>(&self, client: Client) -> anyhow::Result<T> {
 		let s = match self {
