@@ -3,6 +3,10 @@ use std::sync::Arc;
 use agent_core::prelude::Strng;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
+use axum_core::RequestExt;
+use axum_extra::TypedHeader;
+use axum_extra::headers::Authorization;
+use axum_extra::headers::authorization::Bearer;
 use bytes::Bytes;
 use http::Method;
 use http::uri::PathAndQuery;
@@ -144,8 +148,32 @@ impl App {
 		// MCP context is added later
 		req.extensions_mut().insert(Arc::new(ctx));
 
-		// Check if authentication is required and JWT token is missing
 		if let Some(auth) = &authn
+			&& let Some(validator) = &auth.jwt_validator
+			&& !Self::is_well_known_endpoint(req.uri().path())
+		{
+			// Extract Bearer token from Authorization header
+			if let Ok(TypedHeader(Authorization(bearer))) = req
+				.extract_parts::<TypedHeader<Authorization<Bearer>>>()
+				.await
+			{
+				match validator.validate_claims(bearer.token()) {
+					Ok(claims) => {
+						req.headers_mut().remove(http::header::AUTHORIZATION);
+						req.extensions_mut().insert(claims);
+					},
+					Err(_e) => {
+						// MCP authn uses optional mode by default, so if the token is invalid, we return a 401
+						return Self::create_auth_required_response(&req, auth).into_response();
+					}
+				}
+			}
+			// If no token is present, continue without authentication since MCP authn uses optional mode by default
+		}
+		// Fallback for local config mode: Check if JWT claims exist from route-level policy
+		// In local config, MCP authn translates to a route-level JWT policy (jwt_validator is None here),
+		// so validation happens earlier in apply_request_policies and claims are in extensions
+		else if let Some(auth) = &authn
 			&& req.extensions().get::<Claims>().is_none()
 			&& !Self::is_well_known_endpoint(req.uri().path())
 		{

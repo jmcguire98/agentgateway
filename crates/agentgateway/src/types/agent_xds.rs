@@ -143,7 +143,7 @@ impl TryFrom<&proto::agent::backend_policy_spec::McpAuthentication> for McpAuthe
 				extra: Default::default(),
 			},
 			jwks,
-			jwt_validator: Some(jwt_validator),
+			jwt_validator: Some(std::sync::Arc::new(jwt_validator)),
 		})
 	}
 }

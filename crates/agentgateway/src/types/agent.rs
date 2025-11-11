@@ -1288,9 +1288,17 @@ pub struct McpAuthentication {
 	pub audience: String,
 	pub provider: Option<McpIDP>,
 	pub resource_metadata: ResourceMetadata,
+	#[serde(skip, default = "default_empty_remote_jwks")]
 	pub jwks: FileInlineOrRemote,
 	#[serde(skip)]
-	pub jwt_validator: Option<crate::http::jwt::Jwt>,
+	pub jwt_validator: Option<Arc<crate::http::jwt::Jwt>>,
+}
+
+fn default_empty_remote_jwks() -> FileInlineOrRemote {
+	// Empty URL will trigger auto-derivation in as_jwt()
+	FileInlineOrRemote::Remote {
+		url: "".parse().unwrap(),
+	}
 }
 
 impl McpAuthentication {
