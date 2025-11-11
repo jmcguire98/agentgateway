@@ -1288,10 +1288,9 @@ pub struct McpAuthentication {
 	pub audience: String,
 	pub provider: Option<McpIDP>,
 	pub resource_metadata: ResourceMetadata,
-	#[serde(skip)]
+	#[serde(skip_serializing)]
 	pub jwks: FileInlineOrRemote,
 	#[serde(skip)]
-	// currently only used in xds mode
 	pub jwt_validator: Option<Arc<crate::http::jwt::Jwt>>,
 }
 
