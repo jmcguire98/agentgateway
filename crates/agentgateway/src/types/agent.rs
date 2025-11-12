@@ -1297,21 +1297,19 @@ pub struct McpAuthentication {
 impl McpAuthentication {
 	pub fn as_jwt(&self) -> anyhow::Result<http::jwt::LocalJwtConfig> {
 		let jwks = match &self.jwks {
-			FileInlineOrRemote::Remote { url } => {
-				FileInlineOrRemote::Remote {
-					url: if !url.to_string().is_empty() {
-						url.clone()
-					} else {
-						match &self.provider {
-							None | Some(McpIDP::Auth0 { .. }) => {
-								format!("{}/.well-known/jwks.json", self.issuer).parse()?
-							},
-							Some(McpIDP::Keycloak { .. }) => {
-								format!("{}/protocol/openid-connect/certs", self.issuer).parse()?
-							},
-						}
-					},
-				}
+			FileInlineOrRemote::Remote { url } => FileInlineOrRemote::Remote {
+				url: if !url.to_string().is_empty() {
+					url.clone()
+				} else {
+					match &self.provider {
+						None | Some(McpIDP::Auth0 { .. }) => {
+							format!("{}/.well-known/jwks.json", self.issuer).parse()?
+						},
+						Some(McpIDP::Keycloak { .. }) => {
+							format!("{}/protocol/openid-connect/certs", self.issuer).parse()?
+						},
+					}
+				},
 			},
 			FileInlineOrRemote::Inline(_) | FileInlineOrRemote::File { .. } => self.jwks.clone(),
 		};
@@ -1373,7 +1371,7 @@ impl TryFrom<&str> for Target {
 
 	fn try_from(hostport: &str) -> Result<Self, Self::Error> {
 		let Some((host, port)) = hostport.split_once(":") else {
-			anyhow::bail!("invalid host:port: {}", hostport);
+			anyhow::bail!("invalid host:port: {hostport}");
 		};
 		let port: u16 = port.parse()?;
 		(host, port).try_into()

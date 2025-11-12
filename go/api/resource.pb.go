@@ -7165,15 +7165,11 @@ type BackendPolicySpec_McpAuthentication struct {
 	state            protoimpl.MessageState                                `protogen:"open.v1"`
 	Issuer           string                                                `protobuf:"bytes,1,opt,name=issuer,proto3" json:"issuer,omitempty"`
 	Audience         string                                                `protobuf:"bytes,2,opt,name=audience,proto3" json:"audience,omitempty"`
-	Provider         BackendPolicySpec_McpAuthentication_McpIDP            `protobuf:"varint,3,opt,name=provider,proto3,enum=agentgateway.dev.resource.BackendPolicySpec_McpAuthentication_McpIDP" json:"provider,omitempty"`
-	ResourceMetadata *BackendPolicySpec_McpAuthentication_ResourceMetadata `protobuf:"bytes,4,opt,name=resource_metadata,json=resourceMetadata,proto3" json:"resource_metadata,omitempty"`
-	// Types that are valid to be assigned to JwksSource:
-	//
-	//	*BackendPolicySpec_McpAuthentication_JwksUrl
-	//	*BackendPolicySpec_McpAuthentication_JwksInline
-	JwksSource    isBackendPolicySpec_McpAuthentication_JwksSource `protobuf_oneof:"jwks_source"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	JwksInline       string                                                `protobuf:"bytes,3,opt,name=jwks_inline,json=jwksInline,proto3" json:"jwks_inline,omitempty"`
+	Provider         BackendPolicySpec_McpAuthentication_McpIDP            `protobuf:"varint,4,opt,name=provider,proto3,enum=agentgateway.dev.resource.BackendPolicySpec_McpAuthentication_McpIDP" json:"provider,omitempty"`
+	ResourceMetadata *BackendPolicySpec_McpAuthentication_ResourceMetadata `protobuf:"bytes,5,opt,name=resource_metadata,json=resourceMetadata,proto3" json:"resource_metadata,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *BackendPolicySpec_McpAuthentication) Reset() {
@@ -7220,6 +7216,13 @@ func (x *BackendPolicySpec_McpAuthentication) GetAudience() string {
 	return ""
 }
 
+func (x *BackendPolicySpec_McpAuthentication) GetJwksInline() string {
+	if x != nil {
+		return x.JwksInline
+	}
+	return ""
+}
+
 func (x *BackendPolicySpec_McpAuthentication) GetProvider() BackendPolicySpec_McpAuthentication_McpIDP {
 	if x != nil {
 		return x.Provider
@@ -7232,49 +7235,6 @@ func (x *BackendPolicySpec_McpAuthentication) GetResourceMetadata() *BackendPoli
 		return x.ResourceMetadata
 	}
 	return nil
-}
-
-func (x *BackendPolicySpec_McpAuthentication) GetJwksSource() isBackendPolicySpec_McpAuthentication_JwksSource {
-	if x != nil {
-		return x.JwksSource
-	}
-	return nil
-}
-
-func (x *BackendPolicySpec_McpAuthentication) GetJwksUrl() string {
-	if x != nil {
-		if x, ok := x.JwksSource.(*BackendPolicySpec_McpAuthentication_JwksUrl); ok {
-			return x.JwksUrl
-		}
-	}
-	return ""
-}
-
-func (x *BackendPolicySpec_McpAuthentication) GetJwksInline() string {
-	if x != nil {
-		if x, ok := x.JwksSource.(*BackendPolicySpec_McpAuthentication_JwksInline); ok {
-			return x.JwksInline
-		}
-	}
-	return ""
-}
-
-type isBackendPolicySpec_McpAuthentication_JwksSource interface {
-	isBackendPolicySpec_McpAuthentication_JwksSource()
-}
-
-type BackendPolicySpec_McpAuthentication_JwksUrl struct {
-	JwksUrl string `protobuf:"bytes,5,opt,name=jwks_url,json=jwksUrl,proto3,oneof"`
-}
-
-type BackendPolicySpec_McpAuthentication_JwksInline struct {
-	JwksInline string `protobuf:"bytes,6,opt,name=jwks_inline,json=jwksInline,proto3,oneof"`
-}
-
-func (*BackendPolicySpec_McpAuthentication_JwksUrl) isBackendPolicySpec_McpAuthentication_JwksSource() {
-}
-
-func (*BackendPolicySpec_McpAuthentication_JwksInline) isBackendPolicySpec_McpAuthentication_JwksSource() {
 }
 
 type BackendPolicySpec_Ai_Message struct {
@@ -9006,7 +8966,7 @@ const file_resource_proto_rawDesc = "" +
 	"\vPolicyPhase\x12\t\n" +
 	"\x05ROUTE\x10\x00\x12\v\n" +
 	"\aGATEWAY\x10\x01B\x06\n" +
-	"\x04kind\"\xd9.\n" +
+	"\x04kind\"\xab.\n" +
 	"\x11BackendPolicySpec\x12D\n" +
 	"\x03a2a\x18\x01 \x01(\v20.agentgateway.dev.resource.BackendPolicySpec.A2aH\x00R\x03a2a\x12l\n" +
 	"\x11inference_routing\x18\x02 \x01(\v2=.agentgateway.dev.resource.BackendPolicySpec.InferenceRoutingH\x00R\x10inferenceRouting\x12Z\n" +
@@ -9132,15 +9092,14 @@ const file_resource_proto_rawDesc = "" +
 	"\x0fconnect_timeout\x18\x02 \x01(\v2\x19.google.protobuf.DurationR\x0econnectTimeout\x1a<\n" +
 	"\x10McpAuthorization\x12\x14\n" +
 	"\x05allow\x18\x01 \x03(\tR\x05allow\x12\x12\n" +
-	"\x04deny\x18\x02 \x03(\tR\x04deny\x1a\xf3\x04\n" +
+	"\x04deny\x18\x02 \x03(\tR\x04deny\x1a\xc5\x04\n" +
 	"\x11McpAuthentication\x12\x16\n" +
 	"\x06issuer\x18\x01 \x01(\tR\x06issuer\x12\x1a\n" +
-	"\baudience\x18\x02 \x01(\tR\baudience\x12a\n" +
-	"\bprovider\x18\x03 \x01(\x0e2E.agentgateway.dev.resource.BackendPolicySpec.McpAuthentication.McpIDPR\bprovider\x12|\n" +
-	"\x11resource_metadata\x18\x04 \x01(\v2O.agentgateway.dev.resource.BackendPolicySpec.McpAuthentication.ResourceMetadataR\x10resourceMetadata\x12\x1b\n" +
-	"\bjwks_url\x18\x05 \x01(\tH\x00R\ajwksUrl\x12!\n" +
-	"\vjwks_inline\x18\x06 \x01(\tH\x00R\n" +
-	"jwksInline\x1a\xd6\x01\n" +
+	"\baudience\x18\x02 \x01(\tR\baudience\x12\x1f\n" +
+	"\vjwks_inline\x18\x03 \x01(\tR\n" +
+	"jwksInline\x12a\n" +
+	"\bprovider\x18\x04 \x01(\x0e2E.agentgateway.dev.resource.BackendPolicySpec.McpAuthentication.McpIDPR\bprovider\x12|\n" +
+	"\x11resource_metadata\x18\x05 \x01(\v2O.agentgateway.dev.resource.BackendPolicySpec.McpAuthentication.ResourceMetadataR\x10resourceMetadata\x1a\xd6\x01\n" +
 	"\x10ResourceMetadata\x12p\n" +
 	"\x05extra\x18\x01 \x03(\v2Z.agentgateway.dev.resource.BackendPolicySpec.McpAuthentication.ResourceMetadata.ExtraEntryR\x05extra\x1aP\n" +
 	"\n" +
@@ -9149,8 +9108,7 @@ const file_resource_proto_rawDesc = "" +
 	"\x05value\x18\x02 \x01(\v2\x16.google.protobuf.ValueR\x05value:\x028\x01\"!\n" +
 	"\x06McpIDP\x12\t\n" +
 	"\x05AUTH0\x10\x00\x12\f\n" +
-	"\bKEYCLOAK\x10\x01B\r\n" +
-	"\vjwks_sourceB\x06\n" +
+	"\bKEYCLOAK\x10\x01B\x06\n" +
 	"\x04kind\"\xcc\x02\n" +
 	"\x06Policy\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12?\n" +
@@ -9755,10 +9713,6 @@ func file_resource_proto_init() {
 	}
 	file_resource_proto_msgTypes[61].OneofWrappers = []any{
 		(*TrafficPolicySpec_JWTProvider_Inline)(nil),
-	}
-	file_resource_proto_msgTypes[85].OneofWrappers = []any{
-		(*BackendPolicySpec_McpAuthentication_JwksUrl)(nil),
-		(*BackendPolicySpec_McpAuthentication_JwksInline)(nil),
 	}
 	file_resource_proto_msgTypes[88].OneofWrappers = []any{
 		(*BackendPolicySpec_Ai_RegexRule_Builtin)(nil),

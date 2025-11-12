@@ -726,12 +726,9 @@ message BackendPolicySpec {
 
     string issuer = 1;
     string audience = 2;
-    McpIDP provider = 3;
-    ResourceMetadata resource_metadata = 4;
-    oneof jwks_source {
-      string jwks_url = 5;
-      string jwks_inline = 6;
-    }
+    string jwks_inline = 3;
+    McpIDP provider = 4;
+    ResourceMetadata resource_metadata = 5;
   }
 
   oneof kind {
