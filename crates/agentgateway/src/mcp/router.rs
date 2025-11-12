@@ -165,7 +165,7 @@ impl App {
 					Err(_e) => {
 						// MCP authn uses optional mode by default, so if the token is invalid, we return a 401
 						return Self::create_auth_required_response(&req, auth).into_response();
-					}
+					},
 				}
 			}
 			// If no token is present, continue without authentication since MCP authn uses optional mode by default
