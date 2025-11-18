@@ -179,7 +179,9 @@ impl App {
 				// if mcp authn is configured but JWT already validated (claims exist from previous layer),
 				// reject because we cannot validate MCP-specific auth requirements
 				(Some(auth), _, true) => {
-					warn!("MCP backend authentication configured but JWT token already validated and stripped by Gateway or Route level policy");
+					warn!(
+						"MCP backend authentication configured but JWT token already validated and stripped by Gateway or Route level policy"
+					);
 					return Self::create_auth_required_response(&req, auth).into_response();
 				},
 				// if no mcp authn is configured, do nothing
@@ -376,7 +378,7 @@ impl App {
 		// Normalize issuer URL by removing trailing slashes to avoid double-slash in path
 		let issuer = auth.issuer.trim_end_matches('/');
 		let ureq = ::http::Request::builder()
-			.uri(format!("{}/.well-known/oauth-authorization-server", issuer))
+			.uri(format!("{issuer}/.well-known/oauth-authorization-server"))
 			.body(Body::empty())?;
 		let upstream = client.simple_call(ureq).await?;
 		let limit = crate::http::response_buffer_limit(&upstream);
@@ -425,7 +427,7 @@ impl App {
 			.body(axum::body::Body::from(Bytes::from(serde_json::to_string(
 				&resp,
 			)?)))
-			.map_err(|e| anyhow::anyhow!("Failed to build response: {}", e))?;
+			.map_err(|e| anyhow::anyhow!("Failed to build response: {e}"))?;
 
 		Ok(response)
 	}
@@ -439,7 +441,7 @@ impl App {
 		// Normalize issuer URL by removing trailing slashes to avoid double-slash in path
 		let issuer = auth.issuer.trim_end_matches('/');
 		let ureq = ::http::Request::builder()
-			.uri(format!("{}/clients-registrations/openid-connect", issuer))
+			.uri(format!("{issuer}/clients-registrations/openid-connect"))
 			.method(Method::POST)
 			.body(req.into_body())?;
 
