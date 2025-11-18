@@ -176,8 +176,14 @@ impl App {
 				(Some(auth), None, false) => {
 					return Self::create_auth_required_response(&req, auth).into_response();
 				},
-				// if no mcp authn is configured or JWT already validated (claims exist), do nothing
-				_ => {},
+				// if mcp authn is configured but JWT already validated (claims exist from previous layer),
+				// reject because we cannot validate MCP-specific auth requirements
+				(Some(auth), _, true) => {
+					warn!("MCP backend authentication configured but JWT token already validated and stripped by Gateway or Route level policy");
+					return Self::create_auth_required_response(&req, auth).into_response();
+				},
+				// if no mcp authn is configured, do nothing
+				(None, _, _) => {},
 			}
 		}
 
