@@ -142,7 +142,7 @@ This folder contains JSON schemas for various parts of the project
 |`binds[].listeners[].routes[].policies.authorization.rules`||
 |`binds[].listeners[].routes[].policies.mcpAuthentication`|Authentication for MCP clients.|
 |`binds[].listeners[].routes[].policies.mcpAuthentication.issuer`||
-|`binds[].listeners[].routes[].policies.mcpAuthentication.audience`||
+|`binds[].listeners[].routes[].policies.mcpAuthentication.audiences`||
 |`binds[].listeners[].routes[].policies.mcpAuthentication.provider`||
 |`binds[].listeners[].routes[].policies.mcpAuthentication.provider.(any)(1)auth0`||
 |`binds[].listeners[].routes[].policies.mcpAuthentication.provider.(any)(1)keycloak`||
@@ -999,7 +999,7 @@ This folder contains JSON schemas for various parts of the project
 |`policies[].policy.authorization.rules`||
 |`policies[].policy.mcpAuthentication`|Authentication for MCP clients.|
 |`policies[].policy.mcpAuthentication.issuer`||
-|`policies[].policy.mcpAuthentication.audience`||
+|`policies[].policy.mcpAuthentication.audiences`||
 |`policies[].policy.mcpAuthentication.provider`||
 |`policies[].policy.mcpAuthentication.provider.(any)(1)auth0`||
 |`policies[].policy.mcpAuthentication.provider.(any)(1)keycloak`||

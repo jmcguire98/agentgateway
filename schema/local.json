@@ -1178,8 +1178,11 @@
                               "issuer": {
                                 "type": "string"
                               },
-                              "audience": {
-                                "type": "string"
+                              "audiences": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
                               },
                               "provider": {
                                 "anyOf": [
@@ -1256,7 +1259,7 @@
                             "additionalProperties": false,
                             "required": [
                               "issuer",
-                              "audience",
+                              "audiences",
                               "resourceMetadata",
                               "jwks"
                             ],
@@ -9246,8 +9249,11 @@
                   "issuer": {
                     "type": "string"
                   },
-                  "audience": {
-                    "type": "string"
+                  "audiences": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
                   },
                   "provider": {
                     "anyOf": [
@@ -9324,7 +9330,7 @@
                 "additionalProperties": false,
                 "required": [
                   "issuer",
-                  "audience",
+                  "audiences",
                   "resourceMetadata",
                   "jwks"
                 ],
