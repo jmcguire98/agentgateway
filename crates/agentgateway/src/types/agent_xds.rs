@@ -134,8 +134,22 @@ impl TryFrom<&proto::agent::backend_policy_spec::McpAuthentication> for McpAuthe
 			issuer: m.issuer.clone(),
 			audiences: m.audiences.clone(),
 			provider,
-			resource_metadata: ResourceMetadata {
-				extra: Default::default(),
+			resource_metadata: {
+				let extra = m
+					.resource_metadata
+					.as_ref()
+					.map(|rm| {
+						rm.extra
+							.iter()
+							.map(|(k, v)| {
+								let val = serde_json::from_str::<serde_json::Value>(v)
+									.unwrap_or(serde_json::Value::String(v.clone()));
+								(k.clone(), val)
+							})
+							.collect::<std::collections::BTreeMap<_, _>>()
+					})
+					.unwrap_or_default();
+				ResourceMetadata { extra }
 			},
 			jwks,
 			jwt_validator: Some(std::sync::Arc::new(jwt_validator)),
