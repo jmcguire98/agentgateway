@@ -30,7 +30,8 @@ binds:
           - '*'
         mcpAuthentication:
           issuer: http://localhost:9000
-          audience: http://localhost:3000/stdio/mcp
+          audiences:
+          - http://localhost:3000/stdio/mcp
           jwks:
             url: http://localhost:9000/.well-known/jwks.json
           resourceMetadata:
@@ -66,7 +67,8 @@ binds:
           - '*'
         mcpAuthentication:
           issuer: http://localhost:9000
-          audience: http://localhost:3000/remote/mcp
+          audiences:
+          - http://localhost:3000/remote/mcp
           jwks:
             url: http://localhost:9000/.well-known/jwks.json
           resourceMetadata:
@@ -110,7 +112,8 @@ binds:
           - '*'
         mcpAuthentication:
           issuer: http://localhost:7080/realms/mcp
-          audience: mcp_proxy
+          audiences:
+          - mcp_proxy
           jwks:
             url: http://localhost:7080/realms/mcp/protocol/openid-connect/certs
           provider:
@@ -153,7 +156,8 @@ binds:
     #       - '*'
     #     mcpAuthentication:
     #       issuer: https://dev-y6sikgx3n3shy7ci.eu.auth0.com
-    #       audience: urn:agent-gateway
+    #       audiences:
+    #       - urn:agent-gateway
     #       jwks:
     #         url: https://dev-y6sikgx3n3shy7ci.eu.auth0.com/.well-known/jwks.json
     #       provider:
