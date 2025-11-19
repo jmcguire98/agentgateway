@@ -391,7 +391,10 @@ impl App {
 				else {
 					anyhow::bail!("authorization_endpoint missing");
 				};
-				ae.push_str(&format!("?audience={}", auth.audience));
+				// If the user provided multiple audiences with auth0, just prepend the first one
+				if let Some(aud) = auth.audiences.first() {
+					ae.push_str(&format!("?audience={}", aud));
+				}
 			},
 			Some(McpIDP::Keycloak { .. }) => {
 				// Keycloak does not support RFC 8707.

@@ -1285,7 +1285,7 @@ impl ResourceMetadata {
 #[apply(schema!)]
 pub struct McpAuthentication {
 	pub issuer: String,
-	pub audience: String,
+	pub audiences: Vec<String>,
 	pub provider: Option<McpIDP>,
 	pub resource_metadata: ResourceMetadata,
 	#[serde(skip_serializing)]
@@ -1317,7 +1317,7 @@ impl McpAuthentication {
 		Ok(http::jwt::LocalJwtConfig::Single {
 			mode: http::jwt::Mode::Optional,
 			issuer: self.issuer.clone(),
-			audiences: Some(vec![self.audience.clone()]),
+			audiences: Some(self.audiences.clone()),
 			jwks,
 		})
 	}

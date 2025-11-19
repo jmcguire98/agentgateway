@@ -725,7 +725,7 @@ message BackendPolicySpec {
     }
 
     string issuer = 1;
-    string audience = 2;
+    repeated string audiences = 2;
     string jwks_inline = 3;
     McpIDP provider = 4;
     ResourceMetadata resource_metadata = 5;

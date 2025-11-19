@@ -116,7 +116,7 @@ impl TryFrom<&proto::agent::backend_policy_spec::McpAuthentication> for McpAuthe
 			ProtoError::Generic(format!("failed to parse JWKS for MCP Authentication: {e}"))
 		})?;
 
-		let audiences = Some(vec![m.audience.clone()]);
+		let audiences = Some(m.audiences.clone());
 		let jwt_provider = http::jwt::Provider::from_jwks(jwk_set, m.issuer.clone(), audiences)
 			.map_err(|e| {
 				ProtoError::Generic(format!(
@@ -132,7 +132,7 @@ impl TryFrom<&proto::agent::backend_policy_spec::McpAuthentication> for McpAuthe
 
 		Ok(McpAuthentication {
 			issuer: m.issuer.clone(),
-			audience: m.audience.clone(),
+			audiences: m.audiences.clone(),
 			provider,
 			resource_metadata: ResourceMetadata {
 				extra: Default::default(),
