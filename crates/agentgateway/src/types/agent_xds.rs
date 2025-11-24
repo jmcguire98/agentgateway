@@ -140,8 +140,7 @@ impl TryFrom<&proto::agent::backend_policy_spec::McpAuthentication> for McpAuthe
 						rm.extra
 							.iter()
 							.map(|(k, v)| {
-								let val = serde_json::to_value(v)
-									.unwrap_or(serde_json::Value::Null);
+								let val = serde_json::to_value(v).unwrap_or(serde_json::Value::Null);
 								(k.clone(), val)
 							})
 							.collect::<std::collections::BTreeMap<_, _>>()

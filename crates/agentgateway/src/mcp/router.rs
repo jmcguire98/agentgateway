@@ -11,7 +11,7 @@ use bytes::Bytes;
 use http::Method;
 use http::uri::PathAndQuery;
 use rmcp::transport::StreamableHttpServerConfig;
-use tracing::{warn, debug};
+use tracing::{debug, warn};
 
 use crate::cel::ContextBuilder;
 use crate::http::jwt::Claims;
@@ -145,7 +145,7 @@ impl App {
 		ctx.with_extauthz(&req);
 
 		// `response` is not valid here, since we run authz first
-		// MCP context is added later. The context is inserted after 
+		// MCP context is added later. The context is inserted after
 		// authentication so it can include verified claims
 
 		// skip well-known OAuth endpoints for authn
