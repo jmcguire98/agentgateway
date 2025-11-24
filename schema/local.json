@@ -1184,6 +1184,9 @@
                                   "type": "string"
                                 }
                               },
+                              "jwksUrl": {
+                                "type": "string"
+                              },
                               "provider": {
                                 "anyOf": [
                                   {
@@ -1260,6 +1263,7 @@
                             "required": [
                               "issuer",
                               "audiences",
+                              "jwksUrl",
                               "resourceMetadata",
                               "jwks"
                             ],
@@ -9255,6 +9259,9 @@
                       "type": "string"
                     }
                   },
+                  "jwksUrl": {
+                    "type": "string"
+                  },
                   "provider": {
                     "anyOf": [
                       {
@@ -9331,6 +9338,7 @@
                 "required": [
                   "issuer",
                   "audiences",
+                  "jwksUrl",
                   "resourceMetadata",
                   "jwks"
                 ],

@@ -11,7 +11,7 @@ use bytes::Bytes;
 use http::Method;
 use http::uri::PathAndQuery;
 use rmcp::transport::StreamableHttpServerConfig;
-use tracing::warn;
+use tracing::{warn, debug};
 
 use crate::cel::ContextBuilder;
 use crate::http::jwt::Claims;
@@ -145,8 +145,8 @@ impl App {
 		ctx.with_extauthz(&req);
 
 		// `response` is not valid here, since we run authz first
-		// MCP context is added later
-		req.extensions_mut().insert(Arc::new(ctx));
+		// MCP context is added later. The context is inserted after 
+		// authentication so it can include verified claims
 
 		// skip well-known OAuth endpoints for authn
 		if !Self::is_well_known_endpoint(req.uri().path()) {
@@ -162,10 +162,13 @@ impl App {
 					{
 						match validator.validate_claims(bearer.token()) {
 							Ok(claims) => {
+								// Populate context with verified JWT claims before continuing
+								ctx.with_jwt(&claims);
 								req.headers_mut().remove(http::header::AUTHORIZATION);
 								req.extensions_mut().insert(claims);
 							},
 							Err(_e) => {
+								debug!("JWT validation failed: {:?}", _e);
 								return Self::create_auth_required_response(&req, auth).into_response();
 							},
 						}
@@ -188,6 +191,9 @@ impl App {
 				(None, _, _) => {},
 			}
 		}
+
+		// Insert the finalized context (now potentially including verified JWT claims)
+		req.extensions_mut().insert(Arc::new(ctx));
 
 		match (req.uri().path(), req.method(), authn) {
 			("/sse", _, _) => {

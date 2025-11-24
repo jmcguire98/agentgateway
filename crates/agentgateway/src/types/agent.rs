@@ -1288,13 +1288,25 @@ pub struct McpAuthentication {
 	pub audiences: Vec<String>,
 	pub provider: Option<McpIDP>,
 	pub resource_metadata: ResourceMetadata,
+	#[serde(skip)]
+	pub jwt_validator: Option<Arc<crate::http::jwt::Jwt>>,
+}
+
+// Non-xds config for MCP authentication
+#[apply(schema!)]
+pub struct LocalMcpAuthentication {
+	pub issuer: String,
+	pub audiences: Vec<String>,
+	pub jwks_url: String,
+	pub provider: Option<McpIDP>,
+	pub resource_metadata: ResourceMetadata,
 	#[serde(skip_serializing)]
 	pub jwks: FileInlineOrRemote,
 	#[serde(skip)]
 	pub jwt_validator: Option<Arc<crate::http::jwt::Jwt>>,
 }
 
-impl McpAuthentication {
+impl LocalMcpAuthentication {
 	pub fn as_jwt(&self) -> anyhow::Result<http::jwt::LocalJwtConfig> {
 		let jwks = match &self.jwks {
 			FileInlineOrRemote::Remote { url } => FileInlineOrRemote::Remote {
@@ -1319,6 +1331,22 @@ impl McpAuthentication {
 			issuer: self.issuer.clone(),
 			audiences: Some(self.audiences.clone()),
 			jwks,
+		})
+	}
+
+	/// Translate the local (file/env) config into a runtime `McpAuthentication` with a ready validator.
+	pub async fn translate(
+		&self,
+		client: crate::client::Client,
+	) -> anyhow::Result<McpAuthentication> {
+		let jwt_cfg = self.as_jwt()?;
+		let jwt = jwt_cfg.try_into(client).await?;
+		Ok(McpAuthentication {
+			issuer: self.issuer.clone(),
+			audiences: self.audiences.clone(),
+			provider: self.provider.clone(),
+			resource_metadata: self.resource_metadata.clone(),
+			jwt_validator: Some(Arc::new(jwt)),
 		})
 	}
 }

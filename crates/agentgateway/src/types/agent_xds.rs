@@ -116,7 +116,7 @@ impl TryFrom<&proto::agent::backend_policy_spec::McpAuthentication> for McpAuthe
 			ProtoError::Generic(format!("failed to parse JWKS for MCP Authentication: {e}"))
 		})?;
 
-		let audiences = Some(m.audiences.clone());
+		let audiences = (!m.audiences.is_empty()).then(|| m.audiences.clone());
 		let jwt_provider = http::jwt::Provider::from_jwks(jwk_set, m.issuer.clone(), audiences)
 			.map_err(|e| {
 				ProtoError::Generic(format!(
@@ -127,8 +127,6 @@ impl TryFrom<&proto::agent::backend_policy_spec::McpAuthentication> for McpAuthe
 		// Create JWT validator with Optional mode (default for MCP auth)
 		let jwt_validator =
 			http::jwt::Jwt::from_providers(vec![jwt_provider], http::jwt::Mode::Optional);
-
-		let jwks = FileInlineOrRemote::Inline(jwks_json);
 
 		Ok(McpAuthentication {
 			issuer: m.issuer.clone(),
@@ -142,8 +140,8 @@ impl TryFrom<&proto::agent::backend_policy_spec::McpAuthentication> for McpAuthe
 						rm.extra
 							.iter()
 							.map(|(k, v)| {
-								let val = serde_json::from_str::<serde_json::Value>(v)
-									.unwrap_or(serde_json::Value::String(v.clone()));
+								let val = serde_json::to_value(v)
+									.unwrap_or(serde_json::Value::Null);
 								(k.clone(), val)
 							})
 							.collect::<std::collections::BTreeMap<_, _>>()
@@ -151,7 +149,6 @@ impl TryFrom<&proto::agent::backend_policy_spec::McpAuthentication> for McpAuthe
 					.unwrap_or_default();
 				ResourceMetadata { extra }
 			},
-			jwks,
 			jwt_validator: Some(std::sync::Arc::new(jwt_validator)),
 		})
 	}
