@@ -1297,7 +1297,6 @@ pub struct McpAuthentication {
 pub struct LocalMcpAuthentication {
 	pub issuer: String,
 	pub audiences: Vec<String>,
-	pub jwks_url: String,
 	pub provider: Option<McpIDP>,
 	pub resource_metadata: ResourceMetadata,
 	#[serde(skip_serializing)]
