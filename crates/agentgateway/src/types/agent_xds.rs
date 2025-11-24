@@ -148,7 +148,7 @@ impl TryFrom<&proto::agent::backend_policy_spec::McpAuthentication> for McpAuthe
 					.unwrap_or_default();
 				ResourceMetadata { extra }
 			},
-			jwt_validator: Some(std::sync::Arc::new(jwt_validator)),
+			jwt_validator: std::sync::Arc::new(jwt_validator),
 		})
 	}
 }

@@ -1282,27 +1282,24 @@ impl ResourceMetadata {
 	}
 }
 
-#[apply(schema!)]
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
 pub struct McpAuthentication {
 	pub issuer: String,
 	pub audiences: Vec<String>,
 	pub provider: Option<McpIDP>,
 	pub resource_metadata: ResourceMetadata,
-	#[serde(skip)]
-	pub jwt_validator: Option<Arc<crate::http::jwt::Jwt>>,
+	pub jwt_validator: Arc<crate::http::jwt::Jwt>,
 }
 
 // Non-xds config for MCP authentication
-#[apply(schema!)]
+#[apply(schema_de!)]
 pub struct LocalMcpAuthentication {
 	pub issuer: String,
 	pub audiences: Vec<String>,
 	pub provider: Option<McpIDP>,
 	pub resource_metadata: ResourceMetadata,
-	#[serde(skip_serializing)]
 	pub jwks: FileInlineOrRemote,
-	#[serde(skip)]
-	pub jwt_validator: Option<Arc<crate::http::jwt::Jwt>>,
 }
 
 impl LocalMcpAuthentication {
@@ -1345,7 +1342,7 @@ impl LocalMcpAuthentication {
 			audiences: self.audiences.clone(),
 			provider: self.provider.clone(),
 			resource_metadata: self.resource_metadata.clone(),
-			jwt_validator: Some(Arc::new(jwt)),
+			jwt_validator: Arc::new(jwt),
 		})
 	}
 }

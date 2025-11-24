@@ -151,16 +151,15 @@ impl App {
 		// skip well-known OAuth endpoints for authn
 		if !Self::is_well_known_endpoint(req.uri().path()) {
 			let has_claims = req.extensions().get::<Claims>().is_some();
-			let validator = authn.as_ref().and_then(|a| a.jwt_validator.as_ref());
 
-			match (authn.as_ref(), validator, has_claims) {
+			match (authn.as_ref(), has_claims) {
 				// if mcp authn is configured, has a validator, and has no claims yet, validate
-				(Some(auth), Some(validator), false) => {
+				(Some(auth), false) => {
 					if let Ok(TypedHeader(Authorization(bearer))) = req
 						.extract_parts::<TypedHeader<Authorization<Bearer>>>()
 						.await
 					{
-						match validator.validate_claims(bearer.token()) {
+						match auth.jwt_validator.validate_claims(bearer.token()) {
 							Ok(claims) => {
 								// Populate context with verified JWT claims before continuing
 								ctx.with_jwt(&claims);
@@ -175,20 +174,16 @@ impl App {
 					}
 					// MCP authn validation happens in optional mode, so if no token is present, do nothing
 				},
-				// if mcp authn is configured, has no validator, and no claims, reject
-				(Some(auth), None, false) => {
-					return Self::create_auth_required_response(&req, auth).into_response();
-				},
 				// if mcp authn is configured but JWT already validated (claims exist from previous layer),
 				// reject because we cannot validate MCP-specific auth requirements
-				(Some(auth), _, true) => {
+				(Some(auth), true) => {
 					warn!(
 						"MCP backend authentication configured but JWT token already validated and stripped by Gateway or Route level policy"
 					);
 					return Self::create_auth_required_response(&req, auth).into_response();
 				},
 				// if no mcp authn is configured, do nothing
-				(None, _, _) => {},
+				(None, _) => {},
 			}
 		}
 
